@@ -1,0 +1,23 @@
+# Build directories
+build/
+dist/
+deploy/
+*.egg-info/
+
+# Generated test config directory
+config/
+
+# IDE settings
+.vscode/
+
+# Coverage files
+.coverage
+coverage.xml
+
+# Cache
+__pycache__/
+
+# Virtual enviroments
+server/conf_venv
+
+

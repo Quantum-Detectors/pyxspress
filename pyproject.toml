@@ -1,0 +1,137 @@
+[project]
+name = "pyxspress"
+description = "Python utility module for Xspress Odin configuration and testing"
+authors = [{ name = "Ben Bradnick", email = "ben@quantumdetectors.com" }]
+requires-python = ">=3.10"
+readme = "README.rst"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: End Users/Desktop",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.10",
+    "Licence :: Other/Proprietary License",
+]
+dependencies = [
+    "click",
+    "importlib-metadata",
+]
+license-files = ["LICENCE.rst"]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+# Required for the plotting and GUI
+cli = [
+    "click",
+    "h5py",
+    "hdf5plugin",
+    "importlib-metadata",
+    "matplotlib",
+    "numpy<2.0",
+    "pyepics",
+    "pyqt5",
+    "PySide6",
+]
+# Required packages for development
+dev = [
+    "build",
+    "coverage",
+    "mypy",
+    "poethepoet",
+    "pip-licenses",
+    "pyinstaller",
+    "pytest",
+    "pytest-cov",
+    "pytest-env",
+    "pytest-mock",
+    "ruff",
+    "sphinx",
+    "sphinx-rtd-theme",
+    "typing-extensions",
+]
+
+[project.urls]
+Homepage = "https://gitlab.com/qd-xspress3/pyxspress"
+
+[project.scripts]
+xspress-acquire = "pyxspress.cli.acquisition:main"
+xspress-create-config = "pyxspress.cli.create_config:main"
+xspress-list-mode-listener = "pyxspress.cli.list_mode_listener:main"
+xspress-list-mode-decode = "pyxspress.cli.list_mode_decode:main"
+xspress-plot = "pyxspress.cli.plot_data:main"
+xspress-view = "pyxspress.cli.data_gui:main"
+
+[build-system]
+requires = ["setuptools>=61.2"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+cli = ["pyxspress[cli]"]
+dev = ["pyxspress[dev]"]
+
+[tool.uv]
+package = true
+
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.python.org/simple"
+
+[tool.uv.sources]
+pyxspress = { path = ".", editable = true }
+
+[tool.setuptools]
+# Use the src directory for the package
+package-dir = {"" = "src"}
+# Required packages to run the main application
+include-package-data = true
+
+[tool.setuptools.packages.find]
+# Find packages in the src directory
+where = ["src"]
+namespaces = false
+
+[tool.setuptools.package-data]
+pyxspress = [
+    "create_config/common/*",
+    "create_config/templates/*",
+    "create_config/files/*"
+]
+
+[tool.setuptools.dynamic]
+version = {file = ["VERSION.txt"]}
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+# TODO: increase coverage threshold
+addopts = "--tb=native -vv --cov=pyxspress --cov-fail-under=20 --cov-report term --cov-report xml --log-format='%(asctime)s.%(msecs)03d %(filename)-25s %(lineno)4d %(levelname)-8s %(message)s' --log-date-format='%Y-%m-%d %H:%M:%S'"
+testpaths = [
+    "tests",
+]
+env = [
+    "CITESTS",  # Inform the module we are unit testing
+]
+
+[tool.ruff]
+src = ["src", "tests"]
+line-length = 88
+lint.select = [
+    "B",   # flake8-bugbear - https://docs.astral.sh/ruff/rules/#flake8-bugbear-b
+    "C4",  # flake8-comprehensions - https://docs.astral.sh/ruff/rules/#flake8-comprehensions-c4
+    "E",   # pycodestyle errors - https://docs.astral.sh/ruff/rules/#error-e
+    "F",   # pyflakes rules - https://docs.astral.sh/ruff/rules/#pyflakes-f
+    "W",   # pycodestyle warnings - https://docs.astral.sh/ruff/rules/#warning-w
+    "I",   # isort - https://docs.astral.sh/ruff/rules/#isort-i
+    "UP",  # pyupgrade - https://docs.astral.sh/ruff/rules/#pyupgrade-up
+    "SLF", # self - https://docs.astral.sh/ruff/settings/#lintflake8-self
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.mypy]
+ignore_missing_imports = true
+packages = ["pyxspress", "tests"]
+
+[tool.poe.tasks]
+cov = "uv run coverage html"
+docs = "uv run sphinx-build -W -E -b html docs/source docs/build/html"

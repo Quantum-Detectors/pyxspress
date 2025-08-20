@@ -1,0 +1,17 @@
+#!/usr/bin/bash
+
+# ============================================================
+# Launch {chans} channel Odin processes
+# ============================================================
+
+# Launch from config folder
+cd /odin/config
+
+# Odin processes
+{odin_processes}
+
+# ProcServControl IOCs
+procServ -P 9001 /odin/config/stProcServControl.sh
+procServ -P 9002 /odin/config/stOdinProcServControl.sh
+
+cd -

@@ -1,0 +1,312 @@
+4 0 1
+beginScreenProperties
+h {screen_height}
+major 4
+minor 0
+release 1
+w 435
+x 0
+y 0
+bgColor index 3
+botShadowColor index 11
+btnFont "arial-bold-r-14.0"
+ctlBgColor1 index 3
+ctlBgColor2 index 14
+ctlFgColor1 index 25
+ctlFgColor2 index 0
+ctlFont "arial-bold-r-14.0"
+fgColor index 14
+font "arial-medium-r-14.0"
+showGrid
+snapToGrid
+textColor index 14
+title "Device - ODNProcServ"
+topShadowColor index 1
+endScreenProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+h 30
+major 4
+minor 0
+release 0
+w 435
+x 0
+y 0
+
+
+beginGroup
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+h 25
+major 4
+minor 0
+release 0
+w 433
+x 0
+y 2
+fillColor index 0
+lineColor index 1
+endObjectProperties
+
+# (Rectangle)
+object activeRectangleClass
+beginObjectProperties
+h 25
+major 4
+minor 0
+release 0
+w 433
+x 1
+y 3
+fillColor index 0
+lineColor index 11
+endObjectProperties
+
+# (Related Display)
+object relatedDisplayClass
+beginObjectProperties
+h 24
+major 4
+minor 2
+release 0
+w 433
+x 1
+y 3
+bgColor index 3
+botShadowColor index 0
+button3Popup
+buttonLabel "tooltip"
+displayFileName {
+  0 "generic-tooltip"
+}
+fgColor index 14
+font "arial-bold-r-14.0"
+invisible
+numDsps 1
+numPvs 4
+setPosition {
+  0 "button"
+}
+topShadowColor index 0
+xPosOffset 5
+yPosOffset 5
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+h 25
+major 4
+minor 1
+release 0
+w 475
+x 1
+y 3
+bgColor index 48
+fgColor index 14
+font "arial-bold-r-16.0"
+fontAlign "center"
+value {
+  "ODNProcServ Top"
+}
+endObjectProperties
+
+endGroup
+
+
+endObjectProperties
+
+{processes}
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+h 25
+major 4
+minor 1
+release 0
+w 55
+x 225
+y {y_pos_buttons}
+3d
+botShadowColor index 11
+controlPv "XSP-PROC-SERV:START"
+fgColor index 19
+font "arial-bold-r-14.0"
+offColor index 3
+offLabel "Start"
+onColor index 4
+onLabel "Start"
+pressValue "1"
+topShadowColor index 1
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+h 25
+major 4
+minor 1
+release 0
+w 50
+x 290
+y {y_pos_buttons}
+3d
+botShadowColor index 11
+controlPv "XSP-PROC-SERV:STOP"
+fgColor index 24
+font "arial-bold-r-14.0"
+offColor index 3
+offLabel "Stop"
+onColor index 4
+onLabel "Stop"
+pressValue "1"
+topShadowColor index 1
+endObjectProperties
+
+# (Message Button)
+object activeMessageButtonClass
+beginObjectProperties
+h 25
+major 4
+minor 1
+release 0
+w 70
+x 350
+y {y_pos_buttons}
+3d
+botShadowColor index 11
+controlPv "XSP-PROC-SERV:RESTART"
+fgColor index 24
+font "arial-bold-r-14.0"
+offColor index 3
+offLabel "Restart"
+onColor index 4
+onLabel "Restart"
+pressValue "1"
+topShadowColor index 1
+endObjectProperties
+
+# (Group)
+object activeGroupClass
+beginObjectProperties
+h 30
+major 4
+minor 0
+release 0
+w 50
+x 0
+y 0
+
+
+beginGroup
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+h 29
+major 4
+minor 0
+release 0
+w 48
+x 0
+y 0
+fillColor index 0
+lineColor index 1
+lineWidth 2
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+h 29
+major 4
+minor 0
+release 0
+w 48
+x 2
+y 2
+fillColor index 0
+lineColor index 11
+lineWidth 2
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+h 27
+major 4
+minor 0
+release 0
+w 47
+x 2
+y 2
+fill
+fillColor index 48
+lineColor index 49
+lineWidth 3
+endObjectProperties
+
+# (Circle)
+object activeCircleClass
+beginObjectProperties
+h 3
+major 4
+minor 0
+release 0
+w 4
+x 12
+y 6
+fill
+fillColor index 0
+lineColor index 1
+lineWidth 2
+endObjectProperties
+
+# (Static Text)
+object activeXTextClass
+beginObjectProperties
+h 30
+major 4
+minor 1
+release 0
+w 50
+x 0
+y 0
+bgColor index 3
+fgColor index 14
+font "arial-bold-r-14.0"
+fontAlign "center"
+useDisplayBg
+value {
+  "ODNProcServ"
+}
+endObjectProperties
+
+endGroup
+
+
+endObjectProperties
+
+# (Exit Button)
+object activeExitButtonClass
+beginObjectProperties
+h 20
+major 4
+minor 1
+release 0
+w 90
+x 335
+y {y_pos_exit}
+3d
+bgColor index 3
+botShadowColor index 11
+fgColor index 46
+font "arial-medium-r-16.0"
+label "EXIT"
+topShadowColor index 1
+endObjectProperties

@@ -1,0 +1,69 @@
+image: python:3.11-bookworm
+
+stages:
+  - build
+  - deploy
+
+
+linux-build:
+  stage: build
+  variables:
+    UV_CACHE_DIR: .uv-cache
+  cache:
+    # Cache the UV cache in between runs
+    - key:
+        files:
+          - uv.lock
+      paths:
+        - $UV_CACHE_DIR
+  before_script:
+    # Need LibGL for GUI testing
+    - apt update
+    - apt-get -y upgrade
+    - apt-get install -y libgl1 libegl1 libxkbcommon-x11-0 libdbus-1-3
+    - python -V
+    - python -m pip install --upgrade pip
+    - pip install uv
+  script:
+    # Create the development environment
+    - echo "Creating environment"
+    - uv venv --python 3.11
+    - uv pip install --group dev --group cli
+    - uv pip list
+    # Linting
+    - echo "Running linting checks"
+    - uv run ruff check
+    - uv run mypy
+    # Tests
+    - echo "Running unit tests"
+    - uv run pytest
+    # Test installing wheel in new environment
+    - echo "Testing wheel build and deployment"
+    - uv build --wheel
+    - python -m venv test_venv
+    - source test_venv/bin/activate
+    # Install the built module
+    - find ./dist -name "pyxspress*.whl" -exec pip install {}[cli] \;
+    - xspress-create-config -v
+    # Prune UV cache
+    - uv cache prune --ci
+  coverage: /(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/
+
+
+linux-deploy:
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_TAG
+  before_script:
+    - python -V
+    - python -m pip install --upgrade pip
+    - pip install twine build
+  script:
+    # Update version file to match tag
+    - rm -f .\VERSION.txt
+    - echo $CI_COMMIT_TAG > .\VERSION.txt
+    # Build wheel and deploy to GitLab
+    - echo "Building wheel"
+    - python -m build -w
+    - echo "Deploying package to GitLab PyPI"
+    - python -m twine upload -u gitlab-ci-token -p ${CI_JOB_TOKEN} --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi dist/*
