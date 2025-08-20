@@ -1,0 +1,30 @@
+epicsEnvSet "EPICS_CA_MAX_ARRAY_BYTES", '7000000'
+epicsEnvSet "EPICS_TS_MIN_WEST", '0'
+
+epicsEnvSet "PROCSERVCONTROL", "/odin/epics/support/procServControl"
+
+# Device initialisation
+# ---------------------
+
+dbLoadDatabase "${PROCSERVCONTROL}/iocs/autoProcServControl/dbd/autoProcServControl.dbd"
+
+autoProcServControl_registerRecordDeviceDriver(pdbbase)
+
+# Odin ports
+{odin_ports}
+
+# Final ioc initialisation
+# ------------------------
+
+# PVs for control
+{db_load_records}
+
+{proc_serv_control}
+seq(procServControl, "P=XSPRESS")
+
+iocInit
+
+# Post-IOC init
+# -------------
+
+{post_IOC}

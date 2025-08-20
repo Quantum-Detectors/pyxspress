@@ -1,0 +1,148 @@
+#==========================================================
+# Xspress {chans} Channel
+#==========================================================
+#
+# Modified from the original xspress_expanded.substitions
+# file for {chans} channels
+#
+#==========================================================
+
+# Macros:
+#  P        Device Prefix
+#  R        Device Suffix
+#  PORT     Asyn Port name
+#  TIMEOUT  Timeout
+#  ADDR     Asyn Port address
+#  TOTAL    Total number of FR/FP pairs
+file $(ADODIN)/db/OdinDataDriver.template
+{
+pattern { P, R, PORT, TIMEOUT, ADDR, TOTAL }
+    { "XSPRESS", ":OD:", "ODN.OD", "1", "0", "{cards}" }
+}
+
+# Macros:
+#  P        Device Prefix
+#  R        Device Suffix
+#  PORT     Asyn Port name
+#  TIMEOUT  Timeout
+#  ADDR     Asyn Port address
+#  TOTAL    Total number of FR/FP pairs
+file $(ADODIN)/db/OdinData.template
+{
+pattern { P, R, PORT, TIMEOUT, ADDR, TOTAL }
+{odin_data_template}
+}
+
+# Macros:
+#  P      Device Prefix
+#  R      Device Suffix
+#  PORT   Asyn Port name
+#  TOTAL  Total number of FR/FP pairs
+#  GUI    Label for EDM button
+file $(ADODIN)/db/LiveViewPlugin.template
+{
+pattern { P, R, PORT, TOTAL, GUI }
+    { "XSPRESS", ":OD:", "ODN.OD", "{cards}", "ODN.OdinData.View" }
+}
+
+# Macros:
+#  P      Device Prefix
+#  R      Device Suffix
+#  PORT   Asyn Port name
+#  TOTAL  Total number of FR/FP pairs
+#  GUI    Label for EDM button
+file $(ADODIN)/db/BloscPlugin.template
+{
+pattern { P, R, PORT, TOTAL, GUI }
+    { "XSPRESS", ":OD:", "ODN.OD", "{cards}", "ODN.OdinData.Blosc" }
+}
+
+# Macros:
+#  P     Device Prefix
+#  R     Device Suffix
+#  PORT  Asyn Port name
+file $(ADODIN)/db/MetaListener.template
+{
+pattern { P, R, PORT }
+    { "XSPRESS", ":OD:", "ODN.OD" }
+}
+
+# Macros:
+#  P              Device Prefix
+#  R              Device Suffix
+#  PORT           Asyn Port name
+#  ADDR           Asyn Port address
+#  TIMEOUT        Timeout
+#  NUM_PROCESSES  Template argument
+#  MAX_CHANNELS   Template argument
+#  NUM_CARDS      Template argument
+file $(ADODIN)/db/XspressDetector.template
+{
+pattern { P, R, PORT, ADDR, TIMEOUT, NUM_PROCESSES, MAX_CHANNELS, NUM_CARDS }
+    { "XSPRESS", ":CAM:", "ODN.CAM", "0", "1", "2", "{chans}", "{cards}" }
+}
+
+# Macros:
+#  P        Device Prefix
+#  R        Device Suffix
+#  PORT     Asyn Port name
+#  ADDR     Asyn Port address
+#  CHAN     Channel number (=ADDR+1)
+#  TOTAL    Total number of Channels
+#  TIMEOUT  Timeout
+file $(ADODIN)/db/XspressChannel.template
+{
+pattern { P, R, PORT, ADDR, CHAN, TOTAL, TIMEOUT }
+{xspress_channel_template}
+}
+
+# Macros:
+#  P        Device Prefix
+#  R        Device Suffix
+#  PORT     Asyn Port name
+#  ADDR     Asyn Port address
+#  TOTAL    Total number of Cards
+#  TIMEOUT  Timeout
+file $(ADODIN)/db/XspressFem.template
+{
+pattern { P, R, PORT, ADDR, TOTAL, TIMEOUT }
+{xspress_fem_template}
+}
+
+# Macros:
+#  P             Device Prefix
+#  R             Device Suffix
+#  PORT          Asyn Port name
+#  TYPE          Asyn Type e.g. Int32
+#  FTVL          Format, e.g. Int
+#  NELEMENTS     Number of elements
+#  TIMEOUT       Timeout
+#  ADDR          Asyn Port address
+#  NDARRAY_PORT  Input Array Port
+#  NDARRAY_ADDR  Input Array Address
+#  ENABLED       Plugin Enabled at startup?
+#  SCANRATE      Specified scan rate for cpu intensive PVs
+file $(ADCORE)/db/NDStdArrays.template
+{
+pattern { P, R, PORT, TYPE, FTVL, NELEMENTS, TIMEOUT, ADDR, NDARRAY_PORT, NDARRAY_ADDR, ENABLED, SCANRATE }
+    { "XSPRESS", ":ARR:", "ODN.ARR", "Int32", "ULONG", "2359296", "1", "0", "ODN.CAM", "0", "0", "I/O Intr" }
+}
+
+# Macros:
+#  name              Unique detector name, e.g. EIG1
+#  APPLICATION_NAME  Odin application name
+#  PROCESS_NAME      Process name
+file $(ADODIN)/db/OdinProcServProcess.template
+{
+pattern { name, APPLICATION_NAME, PROCESS_NAME }
+{odin_procserv_template}
+}
+
+# Macros:
+#  name    Unique detector name, e.g. EIG1
+#  PREFIX  Prefix of odinprocservcontrol PVs
+file $(ADODIN)/db/OdinProcServ.template
+{
+pattern { name, PREFIX }
+    { "ODN", "XSP-PROC-SERV" }
+}
