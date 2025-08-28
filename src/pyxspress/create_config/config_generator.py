@@ -13,8 +13,8 @@ from pyxspress.create_config.modules.create_frame_processors import (
     frame_processor_json,
 )
 from pyxspress.create_config.modules.create_frame_receivers import (
-    frame_reciever,
-    frame_reciever_json,
+    frame_receiver,
+    frame_receiver_json,
 )
 from pyxspress.create_config.modules.create_gui import create_gui
 from pyxspress.create_config.modules.create_meta_liveView import (
@@ -118,8 +118,8 @@ class ConfigGenerator(Loggable):
             proc_serv_ioc_yaml,
             frame_processor,
             frame_processor_json,
-            frame_reciever,
-            frame_reciever_json,
+            frame_receiver,
+            frame_receiver_json,
         ]
 
         for func_cards_and_channels in funcs_with_cards_and_channels:

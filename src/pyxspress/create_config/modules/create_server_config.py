@@ -15,7 +15,7 @@ def _processor_endpoints(num_cards):
     return fp_ep_str.strip(",")
 
 
-def _reciever_endpoints(num_cards):
+def _receiver_endpoints(num_cards):
     fr_ep_str = ""
     for card in range(num_cards):
         fr_ep_str += f"127.0.0.1:10{(10 * card):03d},"
@@ -34,7 +34,7 @@ def odin_server_config(
         target_dir (Path): Output directory
     """
     fp_endpoints = _processor_endpoints(num_cards)
-    fr_endpoints = _reciever_endpoints(num_cards)
+    fr_endpoints = _receiver_endpoints(num_cards)
     adapter_endpoints = _daq_endpoints(num_cards)
     processes = str(num_cards)
 
