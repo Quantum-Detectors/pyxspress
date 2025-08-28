@@ -1,0 +1,173 @@
+#==========================================================
+# Xspress 8 Channel
+#==========================================================
+#
+# Modified from the original xspress_expanded.substitions
+# file for 8 channels
+#
+#==========================================================
+
+# Macros:
+#  P        Device Prefix
+#  R        Device Suffix
+#  PORT     Asyn Port name
+#  TIMEOUT  Timeout
+#  ADDR     Asyn Port address
+#  TOTAL    Total number of FR/FP pairs
+file $(ADODIN)/db/OdinDataDriver.template
+{
+pattern { P, R, PORT, TIMEOUT, ADDR, TOTAL }
+    { "XSPRESS", ":OD:", "ODN.OD", "1", "0", "4" }
+}
+
+# Macros:
+#  P        Device Prefix
+#  R        Device Suffix
+#  PORT     Asyn Port name
+#  TIMEOUT  Timeout
+#  ADDR     Asyn Port address
+#  TOTAL    Total number of FR/FP pairs
+file $(ADODIN)/db/OdinData.template
+{
+pattern { P, R, PORT, TIMEOUT, ADDR, TOTAL }
+    { "XSPRESS", ":OD1:", "ODN.OD", "1", "0", "4" }
+    { "XSPRESS", ":OD2:", "ODN.OD", "1", "1", "4" }
+    { "XSPRESS", ":OD3:", "ODN.OD", "1", "2", "4" }
+    { "XSPRESS", ":OD4:", "ODN.OD", "1", "3", "4" }
+}
+
+# Macros:
+#  P      Device Prefix
+#  R      Device Suffix
+#  PORT   Asyn Port name
+#  TOTAL  Total number of FR/FP pairs
+#  GUI    Label for EDM button
+file $(ADODIN)/db/LiveViewPlugin.template
+{
+pattern { P, R, PORT, TOTAL, GUI }
+    { "XSPRESS", ":OD:", "ODN.OD", "4", "ODN.OdinData.View" }
+}
+
+# Macros:
+#  P      Device Prefix
+#  R      Device Suffix
+#  PORT   Asyn Port name
+#  TOTAL  Total number of FR/FP pairs
+#  GUI    Label for EDM button
+file $(ADODIN)/db/BloscPlugin.template
+{
+pattern { P, R, PORT, TOTAL, GUI }
+    { "XSPRESS", ":OD:", "ODN.OD", "4", "ODN.OdinData.Blosc" }
+}
+
+# Macros:
+#  P     Device Prefix
+#  R     Device Suffix
+#  PORT  Asyn Port name
+file $(ADODIN)/db/MetaListener.template
+{
+pattern { P, R, PORT }
+    { "XSPRESS", ":OD:", "ODN.OD" }
+}
+
+# Macros:
+#  P              Device Prefix
+#  R              Device Suffix
+#  PORT           Asyn Port name
+#  ADDR           Asyn Port address
+#  TIMEOUT        Timeout
+#  NUM_PROCESSES  Template argument
+#  MAX_CHANNELS   Template argument
+#  NUM_CARDS      Template argument
+file $(ADODIN)/db/XspressDetector.template
+{
+pattern { P, R, PORT, ADDR, TIMEOUT, NUM_PROCESSES, MAX_CHANNELS, NUM_CARDS }
+    { "XSPRESS", ":CAM:", "ODN.CAM", "0", "1", "2", "8", "4" }
+}
+
+# Macros:
+#  P        Device Prefix
+#  R        Device Suffix
+#  PORT     Asyn Port name
+#  ADDR     Asyn Port address
+#  CHAN     Channel number (=ADDR+1)
+#  TOTAL    Total number of Channels
+#  TIMEOUT  Timeout
+file $(ADODIN)/db/XspressChannel.template
+{
+pattern { P, R, PORT, ADDR, CHAN, TOTAL, TIMEOUT }
+    { "XSPRESS", ":CAM:", "ODN.CAM", "0", "1", "8", "1" }
+    { "XSPRESS", ":CAM:", "ODN.CAM", "1", "2", "8", "1" }
+    { "XSPRESS", ":CAM:", "ODN.CAM", "2", "3", "8", "1" }
+    { "XSPRESS", ":CAM:", "ODN.CAM", "3", "4", "8", "1" }
+    { "XSPRESS", ":CAM:", "ODN.CAM", "4", "5", "8", "1" }
+    { "XSPRESS", ":CAM:", "ODN.CAM", "5", "6", "8", "1" }
+    { "XSPRESS", ":CAM:", "ODN.CAM", "6", "7", "8", "1" }
+    { "XSPRESS", ":CAM:", "ODN.CAM", "7", "8", "8", "1" }
+}
+
+# Macros:
+#  P        Device Prefix
+#  R        Device Suffix
+#  PORT     Asyn Port name
+#  ADDR     Asyn Port address
+#  TOTAL    Total number of Cards
+#  TIMEOUT  Timeout
+file $(ADODIN)/db/XspressFem.template
+{
+pattern { P, R, PORT, ADDR, TOTAL, TIMEOUT }
+    { "XSPRESS", ":CAM:", "ODN.CAM", "0", "4", "1" }
+    { "XSPRESS", ":CAM:", "ODN.CAM", "1", "4", "1" }
+    { "XSPRESS", ":CAM:", "ODN.CAM", "2", "4", "1" }
+    { "XSPRESS", ":CAM:", "ODN.CAM", "3", "4", "1" }
+}
+
+# Macros:
+#  P             Device Prefix
+#  R             Device Suffix
+#  PORT          Asyn Port name
+#  TYPE          Asyn Type e.g. Int32
+#  FTVL          Format, e.g. Int
+#  NELEMENTS     Number of elements
+#  TIMEOUT       Timeout
+#  ADDR          Asyn Port address
+#  NDARRAY_PORT  Input Array Port
+#  NDARRAY_ADDR  Input Array Address
+#  ENABLED       Plugin Enabled at startup?
+#  SCANRATE      Specified scan rate for cpu intensive PVs
+file $(ADCORE)/db/NDStdArrays.template
+{
+pattern { P, R, PORT, TYPE, FTVL, NELEMENTS, TIMEOUT, ADDR, NDARRAY_PORT, NDARRAY_ADDR, ENABLED, SCANRATE }
+    { "XSPRESS", ":ARR:", "ODN.ARR", "Int32", "ULONG", "2359296", "1", "0", "ODN.CAM", "0", "0", "I/O Intr" }
+}
+
+# Macros:
+#  name              Unique detector name, e.g. EIG1
+#  APPLICATION_NAME  Odin application name
+#  PROCESS_NAME      Process name
+file $(ADODIN)/db/OdinProcServProcess.template
+{
+pattern { name, APPLICATION_NAME, PROCESS_NAME }
+    { "ODN", "OdinServer", "XSP-ODN-01" }
+    { "ODN", "MetaWriter", "XSP-ODN-02" }
+    { "ODN", "ControlServer", "XSP-ODN-03" }
+    { "ODN", "LiveViewMerge", "XSP-ODN-04" }
+    { "ODN", "FrameReceiver1", "XSP-ODN-05" }
+    { "ODN", "FrameProcessor1", "XSP-ODN-06" }
+    { "ODN", "FrameReceiver2", "XSP-ODN-07" }
+    { "ODN", "FrameProcessor2", "XSP-ODN-08" }
+    { "ODN", "FrameReceiver3", "XSP-ODN-09" }
+    { "ODN", "FrameProcessor3", "XSP-ODN-10" }
+    { "ODN", "FrameReceiver4", "XSP-ODN-11" }
+    { "ODN", "FrameProcessor4", "XSP-ODN-12" }
+    { "ODN", "XSPRESS", "XSPRESS" }
+}
+
+# Macros:
+#  name    Unique detector name, e.g. EIG1
+#  PREFIX  Prefix of odinprocservcontrol PVs
+file $(ADODIN)/db/OdinProcServ.template
+{
+pattern { name, PREFIX }
+    { "ODN", "XSP-PROC-SERV" }
+}
