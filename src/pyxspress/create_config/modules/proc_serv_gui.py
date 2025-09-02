@@ -128,6 +128,10 @@ def main_gui(
         template_dir (Path): Template directory
         output_dir (Path): Output directory for generated screen file
     """
+    if not output_dir.exists() or not output_dir.is_dir():
+        logger.warning("Skipping EDL GUI generation as EDL directory does not exist")
+        return
+
     height = 210 + ((num_cards - 1) * 35)
     button_pos = height - 65
     exit_button_pos = height - 30
@@ -140,13 +144,10 @@ def main_gui(
     proc_file_string = proc_file_string.replace("{y_pos_buttons}", str(button_pos))
     proc_file_string = proc_file_string.replace("{y_pos_exit}", str(exit_button_pos))
 
-    if output_dir.exists() and output_dir.is_dir():
-        edl_filepath = output_dir / "ODNProcServ.edl"
-        logger.info(f"Writing EDL file to {edl_filepath}")
-        with open(edl_filepath, "w") as edl_file:
-            edl_file.write(proc_file_string)
-    else:
-        logger.warning("Skipping EDL GUI generation as EDL directory does not exist")
+    edl_filepath = output_dir / "ODNProcServ.edl"
+    logger.info(f"Writing EDL file to {edl_filepath}")
+    with open(edl_filepath, "w") as edl_file:
+        edl_file.write(proc_file_string)
 
 
 def create_gui(num_cards: int, template_dir: Path, output_dir: Path):

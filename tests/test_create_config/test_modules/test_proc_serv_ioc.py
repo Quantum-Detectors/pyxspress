@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from pyxspress.create_config.modules.create_proc_serv_ioc import (
+from pyxspress.create_config.modules.proc_serv_ioc import (
     _db_load_records,
     _odin_ports,
     _post_IOC,
@@ -10,7 +10,7 @@ from pyxspress.create_config.modules.create_proc_serv_ioc import (
 )
 
 
-def test_odin_ports():
+def test_odin_ports() -> None:
     num_cards = 2
     result = _odin_ports(num_cards)
     chan_base = 4010
@@ -30,7 +30,7 @@ def test_odin_ports():
         )
 
 
-def test_db_load_records():
+def test_db_load_records() -> None:
     num_cards = 2
     proc_temp = 'dbLoadRecords "${PROCSERVCONTROL}/db/procServControl.template",'
     result = _db_load_records(num_cards)
@@ -45,7 +45,7 @@ def test_db_load_records():
         assert '"P=XSPRESS, PORT=ADOdinPort"' in result
 
 
-def test_proc_serv_control():
+def test_proc_serv_control() -> None:
     num_cards = 2
     total_records = 4 + (2 * num_cards)
     result = _proc_serv_control(num_cards)
@@ -55,7 +55,7 @@ def test_proc_serv_control():
         assert proc_serv_string in result
 
 
-def test_post_IOC():
+def test_post_IOC() -> None:
     num_cards = 2
     result = _post_IOC(num_cards)
     for i in range(num_cards):
@@ -68,10 +68,10 @@ def test_post_IOC():
         assert post_IOC_string in result
 
 
-@patch("pyxspress.create_config.modules.create_proc_serv_ioc._odin_ports")
-@patch("pyxspress.create_config.modules.create_proc_serv_ioc._db_load_records")
-@patch("pyxspress.create_config.modules.create_proc_serv_ioc._proc_serv_control")
-@patch("pyxspress.create_config.modules.create_proc_serv_ioc._post_IOC")
+@patch("pyxspress.create_config.modules.proc_serv_ioc._odin_ports")
+@patch("pyxspress.create_config.modules.proc_serv_ioc._db_load_records")
+@patch("pyxspress.create_config.modules.proc_serv_ioc._proc_serv_control")
+@patch("pyxspress.create_config.modules.proc_serv_ioc._post_IOC")
 def test_proc_serv_ioc(
     mock_post_ioc,
     mock_proc_serv_control,
@@ -79,7 +79,7 @@ def test_proc_serv_ioc(
     mock_odin_ports,
     template_dir,
     tmp_path,
-):
+) -> None:
     num_cards = 2
     mock_post_ioc.return_value = "<mock_post_IOC>"
     mock_proc_serv_control.return_value = "<mock_proc_serv_control>"
@@ -102,7 +102,7 @@ def test_proc_serv_ioc(
     assert "<mock_odin_ports>" in text
 
 
-def test_proc_serv_ioc_yaml(template_dir, tmp_path):
+def test_proc_serv_ioc_yaml(template_dir, tmp_path) -> None:
     num_cards = 2
     proc_serv_ioc_yaml(num_cards, template_dir, tmp_path)
 

@@ -1,19 +1,19 @@
 from unittest.mock import patch
 
-from pyxspress.create_config.modules.create_frame_processors import (
-    frame_processor,
-    frame_processor_json,
+from pyxspress.create_config.modules.fp_config import (
+    create_fp_config_file,
+    create_fp_launch_script,
 )
 
 
 @patch("os.chmod")
-def test_frame_processor(mock_chmod, tmp_path, template_dir):
+def test_create_fp_launch_script(mock_chmod, tmp_path, template_dir) -> None:
     # Setup
     num_cards = 2
     target_dir = tmp_path
 
     # Call function
-    frame_processor(num_cards, template_dir, target_dir)
+    create_fp_launch_script(num_cards, template_dir, target_dir)
 
     # Assert
     for card in range(num_cards):
@@ -23,20 +23,19 @@ def test_frame_processor(mock_chmod, tmp_path, template_dir):
         assert (
             f"/odin/prefix/bin/frameProcessor --ctrl=tcp://0.0.0.0:10{num} "
             f"--config=$SCRIPT_DIR/fp{card + 1}.json "
-            f"--log-config $SCRIPT_DIR/log4cxx.xml"
-            in text
+            f"--log-config $SCRIPT_DIR/log4cxx.xml" in text
         )
 
     assert mock_chmod.call_count == num_cards
 
 
-def test_frame_processor_json(tmp_path, template_dir):
+def test_create_fp_config_file(tmp_path, template_dir) -> None:
     # Setup
     num_cards = 2
     target_dir = tmp_path
 
     # call function
-    frame_processor_json(num_cards, template_dir, target_dir)
+    create_fp_config_file(num_cards, template_dir, target_dir)
 
     for card in range(num_cards):
         assert (target_dir / f"fp{card + 1}.json").exists()

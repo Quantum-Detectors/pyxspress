@@ -1,12 +1,12 @@
 from unittest.mock import patch
 
-from pyxspress.create_config.modules.create_odin_launch_script import (
+from pyxspress.create_config.modules.odin_launcher import (
     _odin_processes,
     launch_n_chan,
 )
 
 
-def test_odin_processes():
+def test_odin_processes() -> None:
     num_cards = 3
     result_string = _odin_processes(num_cards)
 
@@ -24,9 +24,9 @@ def test_odin_processes():
         assert "procServ -P 4004 /odin/config/stLiveViewMerge.sh\n\n" in result_string
 
 
-@patch("pyxspress.create_config.modules.create_odin_launch_script._odin_processes")
+@patch("pyxspress.create_config.modules.odin_launcher._odin_processes")
 @patch("os.chmod")
-def test_launch_n_chan(mock_chmod, mock_odin_processes, template_dir, tmp_path):
+def test_launch_n_chan(mock_chmod, mock_odin_processes, template_dir, tmp_path) -> None:
     num_cards = 2
     num_chans = 4
     mock_output_text = "mocked_odin_processes_output"

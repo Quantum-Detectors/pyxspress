@@ -3,7 +3,7 @@ import string
 from pathlib import Path
 
 
-def frame_processor(num_cards: int, template_dir: Path, target_dir: Path):
+def create_fp_launch_script(num_cards: int, template_dir: Path, target_dir: Path):
     """Create the frame processor launch script
 
     Args:
@@ -29,8 +29,8 @@ def frame_processor(num_cards: int, template_dir: Path, target_dir: Path):
         os.chmod(target_filepath, 0o755)
 
 
-def frame_processor_json(num_cards: int, template_dir: Path, target_dir: Path):
-    """Create the frame processor configuration file
+def create_fp_config_file(num_cards: int, template_dir: Path, target_dir: Path):
+    """Create the frame processor JSON configuration file
 
     Args:
         num_cards (int): Number of cards

@@ -5,28 +5,30 @@ from glob import glob
 from pathlib import Path
 from typing import Any
 
-from pyxspress.create_config.modules.create_expanded_substitutions import (
-    xspress_expanded_substitutions,
+from pyxspress.create_config.modules.adodin_config import (
+    generate_ioc_boot_script,
+    generate_ioc_db_substitutions,
+    rebuild_adodin,
 )
-from pyxspress.create_config.modules.create_frame_processors import (
-    frame_processor,
-    frame_processor_json,
+from pyxspress.create_config.modules.fp_config import (
+    create_fp_config_file,
+    create_fp_launch_script,
 )
-from pyxspress.create_config.modules.create_frame_receivers import (
-    frame_receiver,
-    frame_receiver_json,
+from pyxspress.create_config.modules.fr_config import (
+    create_fr_config_file,
+    create_fr_launch_script,
 )
-from pyxspress.create_config.modules.create_gui import create_gui
-from pyxspress.create_config.modules.create_meta_liveView import (
-    live_view_file,
-    meta_writer_file,
+from pyxspress.create_config.modules.meta_config import (
+    create_live_view_launch_script,
+    create_meta_writer_launch_script,
 )
-from pyxspress.create_config.modules.create_odin_launch_script import launch_n_chan
-from pyxspress.create_config.modules.create_proc_serv_ioc import (
+from pyxspress.create_config.modules.odin_launcher import launch_n_chan
+from pyxspress.create_config.modules.odin_server_config import odin_server_config
+from pyxspress.create_config.modules.proc_serv_gui import create_gui
+from pyxspress.create_config.modules.proc_serv_ioc import (
     proc_serv_ioc,
     proc_serv_ioc_yaml,
 )
-from pyxspress.create_config.modules.create_server_config import odin_server_config
 from pyxspress.util import Loggable
 
 
@@ -37,8 +39,9 @@ class ConfigGenerator(Loggable):
     module_dir = config_dir / "modules"
     template_dir = config_dir / "templates"
 
-    # ADOdin paths
+    # Installed ADOdin paths
     adodin_dir = Path("/odin/epics/support/ADOdin")
+    adodin_ioc_boot_dir = adodin_dir / "iocs/xspress/iocBoot/iocxspress"
     adodin_ioc_db_dir = adodin_dir / "iocs/xspress/xspressApp/Db"
     adodin_edl_dir = adodin_dir / "iocs/xspress/xspressApp/opi/edl"
 
@@ -76,9 +79,31 @@ class ConfigGenerator(Loggable):
         self.epics_path = epics_path
         self.test = test
 
+        # For Mk2 we have 1 processor per card
+        self.num_processors = num_cards
+
+        # Generated configuration functions with common arguments
+        self.funcs_with_cards_and_channels: list[
+            Callable[[int, int, Path, Path], Any]
+        ] = [
+            odin_server_config,
+            create_meta_writer_launch_script,
+            launch_n_chan,
+        ]
+        self.funcs_with_cards_only: list[Callable[[int, Path, Path], Any]] = [
+            create_live_view_launch_script,
+            proc_serv_ioc,
+            proc_serv_ioc_yaml,
+            create_fp_launch_script,
+            create_fp_config_file,
+            create_fr_launch_script,
+            create_fr_config_file,
+        ]
+
         if self.test:
             # If testing then update the EDL directory to just use the EPICS dir
             self.adodin_edl_dir = self.epics_path
+            self.adodin_ioc_boot_dir = self.epics_path
 
     def clean(self) -> None:
         """Clean the target configuration directory"""
@@ -103,48 +128,39 @@ class ConfigGenerator(Loggable):
             self.logger.info(f"Creating config directory: {self.odin_path}")
             os.mkdir(self.odin_path)
 
-        # Standard config files
         self.__copy_common_files()
 
-        # Generated configuration
-        funcs_with_cards_and_channels: list[Callable[[int, int, Path, Path], Any]] = [
-            odin_server_config,
-            meta_writer_file,
-            launch_n_chan,
-        ]
-        funcs_with_cards_only: list[Callable[[int, Path, Path], Any]] = [
-            live_view_file,
-            proc_serv_ioc,
-            proc_serv_ioc_yaml,
-            frame_processor,
-            frame_processor_json,
-            frame_receiver,
-            frame_receiver_json,
-        ]
-
-        for func_cards_and_channels in funcs_with_cards_and_channels:
+        for func_cards_and_channels in self.funcs_with_cards_and_channels:
             func_cards_and_channels(
                 self.num_cards, self.num_chans, self.template_dir, self.odin_path
             )
 
-        for func_with_cards_only in funcs_with_cards_only:
+        for func_with_cards_only in self.funcs_with_cards_only:
             func_with_cards_only(self.num_cards, self.template_dir, self.odin_path)
 
-        # IOC template
-        xspress_expanded_substitutions(
+        self.__create_adodin_ioc_files()
+
+        self.logger.info("Config generation complete!")
+
+    def __create_adodin_ioc_files(self) -> None:
+        generate_ioc_db_substitutions(
             self.num_cards,
             self.num_chans,
             self.template_dir,
-            self.adodin_dir,
             self.adodin_ioc_db_dir,
             self.epics_path,
             self.test,
         )
 
-        # GUI
+        generate_ioc_boot_script(
+            self.template_dir, self.adodin_ioc_boot_dir, self.num_processors
+        )
+
         create_gui(self.num_cards, self.template_dir, self.adodin_edl_dir)
 
-        self.logger.info("Config generation complete!")
+        # Rebuild ADOdin if not testing
+        if not self.test:
+            rebuild_adodin(self.adodin_dir)
 
     def __copy_common_files(self) -> None:
         self.logger.info("Copying common shell scripts")

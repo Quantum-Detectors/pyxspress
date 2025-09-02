@@ -8,6 +8,20 @@ The format is based on `Keep a Changelog
 Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
 
+0.5.1
+-----
+
+Added:
+
+- Added unit tests for the Odin runtime configuration generation
+- Added generation of ADOdin IOC boot script to configure for the correct number
+  of Odin data FR/FP pairs
+
+Changed:
+
+- Refactored and renamed create_config modules to be more descriptive
+
+
 0.5.0
 -----
 
