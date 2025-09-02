@@ -69,8 +69,7 @@ We can then install the dependencies including optional group dependencies:
 
 .. code-block:: bash
 
-  $ uv pip install --group cli
-  $ uv pip install --group dev
+  $ uv pip install --group cli --group dev
 
 
 The dependencies can be locked and/or synced:

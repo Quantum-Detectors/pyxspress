@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from pyxspress.create_config.modules.create_server_config import (
+from pyxspress.create_config.modules.odin_server_config import (
     _daq_endpoints,
     _processor_endpoints,
     _receiver_endpoints,
@@ -8,7 +8,7 @@ from pyxspress.create_config.modules.create_server_config import (
 )
 
 
-def test_daq_endpoints():
+def test_daq_endpoints() -> None:
     num_cards = 3
     result = _daq_endpoints(num_cards)
     for card in range(num_cards):
@@ -16,7 +16,7 @@ def test_daq_endpoints():
         assert daq_ep_str in result
 
 
-def test_processor_endpoints():
+def test_processor_endpoints() -> None:
     num_cards = 3
     result = _processor_endpoints(num_cards)
     for card in range(num_cards):
@@ -24,7 +24,7 @@ def test_processor_endpoints():
         assert fp_ep_str in result
 
 
-def test_receiver_endpoints():
+def test_receiver_endpoints() -> None:
     num_cards = 3
     result = _receiver_endpoints(num_cards)
     for card in range(num_cards):
@@ -32,12 +32,12 @@ def test_receiver_endpoints():
         assert fr_ep_str in result
 
 
-@patch("pyxspress.create_config.modules.create_server_config._processor_endpoints")
-@patch("pyxspress.create_config.modules.create_server_config._receiver_endpoints")
-@patch("pyxspress.create_config.modules.create_server_config._daq_endpoints")
+@patch("pyxspress.create_config.modules.odin_server_config._processor_endpoints")
+@patch("pyxspress.create_config.modules.odin_server_config._receiver_endpoints")
+@patch("pyxspress.create_config.modules.odin_server_config._daq_endpoints")
 def test_odin_server_config(
     mock_daq, mock_receiver, mock_processor, template_dir, tmp_path
-):
+) -> None:
     num_cards = 3
     num_chans = 6
     mock_daq.return_value = "daq_endpoints"

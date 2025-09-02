@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 
-def frame_receiver(num_cards: int, template_dir: Path, target_dir: Path):
+def create_fr_launch_script(num_cards: int, template_dir: Path, target_dir: Path):
     """Create the frame receiver launch script
 
     Args:
@@ -26,8 +26,8 @@ def frame_receiver(num_cards: int, template_dir: Path, target_dir: Path):
             os.chmod(target_filepath, 0o755)
 
 
-def frame_receiver_json(num_cards: int, template_dir: Path, target_dir: Path):
-    """Create the frame receiver configuration file
+def create_fr_config_file(num_cards: int, template_dir: Path, target_dir: Path):
+    """Create the frame receiver JSON configuration file
 
     Args:
         num_cards (int): Number of cards

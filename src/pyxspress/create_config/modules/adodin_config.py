@@ -2,12 +2,14 @@ import shutil
 import subprocess
 from pathlib import Path
 
+from jinja2 import Environment, FileSystemLoader
+
 from pyxspress.util.util import get_module_logger
 
 logger = get_module_logger(sub_module="substitutions")
 
 
-def _odin_data_template(num_cards):
+def _odin_data_template(num_cards: int):
     od_temp_string = ""
     for i in range(num_cards):
         od_temp_string += (
@@ -17,7 +19,7 @@ def _odin_data_template(num_cards):
     return od_temp_string.strip("\n")
 
 
-def _xspress_channel_template(num_chans):
+def _xspress_channel_template(num_chans: int):
     xspress_chan_temp_string = ""
     for i in range(num_chans):
         xspress_chan_temp_string += (
@@ -27,7 +29,7 @@ def _xspress_channel_template(num_chans):
     return xspress_chan_temp_string.strip("\n")
 
 
-def _xspress_fem_template(num_cards):
+def _xspress_fem_template(num_cards: int):
     xspress_fem_string = ""
     for i in range(num_cards):
         xspress_fem_string += (
@@ -36,7 +38,7 @@ def _xspress_fem_template(num_cards):
     return xspress_fem_string.strip("\n")
 
 
-def _odin_procserv_template(num_cards):
+def _odin_procserv_template(num_cards: int):
     odin_procserv_string = '    { "ODN", "OdinServer", "XSP-ODN-01" }\n'
     odin_procserv_string += '    { "ODN", "MetaWriter", "XSP-ODN-02" }\n'
     odin_procserv_string += '    { "ODN", "ControlServer", "XSP-ODN-03" }\n'
@@ -55,11 +57,10 @@ def _odin_procserv_template(num_cards):
     return odin_procserv_string.strip("\n")
 
 
-def xspress_expanded_substitutions(
+def generate_ioc_db_substitutions(
     num_cards: int,
     num_chans: int,
     template_dir: Path,
-    adodin_dir: Path,
     adodin_db_dir: Path,
     epics_config_dir: Path,
     test: bool,
@@ -70,7 +71,6 @@ def xspress_expanded_substitutions(
         num_cards (int): Number of cards
         num_chans (int): Number of channels
         template_dir (Path): Template directory
-        adodin_dir (Path): Root of ADOdin
         adodin_db_dir (Path): Where to write generated substitutions file
         test (bool): True if in test mode (Does not deploy to ADOdin directory)
     """
@@ -116,7 +116,44 @@ def xspress_expanded_substitutions(
         # IOC template file directory and rebuild ADOdin
         if adodin_db_dir.exists() and adodin_db_dir.is_dir():
             shutil.copy(file_path, adodin_db_dir)
-            try:
-                subprocess.run(["make"], cwd=adodin_dir, check=True)
-            except subprocess.CalledProcessError as e:
-                print(f"Make command failed with error {e}")
+
+
+def generate_ioc_boot_script(
+    template_dir: Path, adodin_ioc_boot_dir: Path, num_processors: int
+):
+    """Generate the ADOdin IOC boot script
+
+    This needs to be configured based on the number of Odin processors
+    that are running.
+
+    Args:
+        template_dir (Path): Source template directory
+        adodin_ioc_boot_dir (Path): ADOdin source IOC boot directory for Xspress
+        num_processors (int): Number of Odin data processors
+    """
+    environment = Environment(loader=FileSystemLoader(template_dir))
+    template = environment.get_template("adodin_ioc.boot.template")
+
+    ioc_boot = template.render(num_processors=num_processors)
+
+    boot_file_path = adodin_ioc_boot_dir / "stxspress.boot"
+    logger.info(f"Writing ADOdin IOC boot file: {boot_file_path}")
+    with open(boot_file_path, "w") as ioc_boot_file:
+        # Add trailing newline as otherwise it gets skipped by IOC shell
+        ioc_boot_file.write(ioc_boot + "\n")
+
+
+def rebuild_adodin(adodin_path: Path) -> None:
+    """Rebuild ADOdin module
+
+    This needs to be done to copy the generate substitutions template
+    and IOC boot script to the build directories of ADOdin for ADOdin
+    IOC to use.
+
+    Args:
+        adodin_path (Path): ADODin support module path
+    """
+    try:
+        subprocess.run(["make"], cwd=adodin_path, check=True)
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Make command failed with error: {e}")

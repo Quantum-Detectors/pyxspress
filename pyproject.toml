@@ -14,6 +14,7 @@ classifiers = [
 ]
 dependencies = [
     "click",
+    "jinja2",
     "importlib-metadata",
 ]
 license-files = ["LICENCE.rst"]

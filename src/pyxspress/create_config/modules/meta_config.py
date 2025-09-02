@@ -20,8 +20,10 @@ def _live_view(num_cards):
     return live_view_str.strip(",")
 
 
-def live_view_file(num_cards: int, template_dir: Path, target_dir: Path):
-    """Create the live view config file
+def create_live_view_launch_script(
+    num_cards: int, template_dir: Path, target_dir: Path
+):
+    """Create the live view launch script
 
     Args:
         num_cards (int): Number of cards
@@ -42,7 +44,7 @@ def live_view_file(num_cards: int, template_dir: Path, target_dir: Path):
     os.chmod(target_filepath, 0o755)
 
 
-def meta_writer_file(
+def create_meta_writer_launch_script(
     num_cards: int, num_chans: int, template_dir: Path, target_dir: Path
 ) -> None:
     """Create the metawriter config file
