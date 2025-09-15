@@ -1,10 +1,10 @@
 [
     {
         "fr_setup": {
-            "fr_ready_cnxn": "tcp://127.0.0.1:10{ready}",
-            "fr_release_cnxn": "tcp://127.0.0.1:10{release}"
+            "fr_ready_cnxn": "tcp://127.0.0.1:{{ ready_port }}",
+            "fr_release_cnxn": "tcp://127.0.0.1:{{ release_port }}"
         },
-        "meta_endpoint": "tcp://*:10{meta}"
+        "meta_endpoint": "tcp://*:{{ meta_port }}"
     },
     {
         "plugin": {
@@ -124,53 +124,14 @@
                 "rank": 0
             },
             "file": {
-                "postfix": "{postfix}"
+                "postfix": "{{ filename_postfix }}"
             }
         }
     },
+    {{ mca_datasets }},
     {
         "hdf": {
-            "dataset": {
-                "mca_{chan_1}": {
-                    "datatype": "uint32",
-                    "chunks": [
-                        256,
-                        1,
-                        4096
-                    ],
-                    "dims": [
-                        1,
-                        4096
-                    ],
-                    "compression": "blosc",
-                    "indexes": true
-                }
-            }
-        }
-    },
-    {
-        "hdf": {
-            "dataset": {
-                "mca_{chan_2}": {
-                    "datatype": "uint32",
-                    "chunks": [
-                        256,
-                        1,
-                        4096
-                    ],
-                    "dims": [
-                        1,
-                        4096
-                    ],
-                    "compression": "blosc",
-                    "indexes": true
-                }
-            }
-        }
-    },
-    {
-        "hdf": {
-            "master": "mca_{chan_2}"
+            "master": "{{ master_mca_dataset }}"
         }
     },
     {
@@ -180,7 +141,7 @@
     },
     {
         "view": {
-            "live_view_socket_addr": "tcp://0.0.0.0:155{lv_socket}",
+            "live_view_socket_addr": "tcp://0.0.0.0:{{ live_view_port }}",
             "dataset_name": "live",
             "frame_frequency": 0,
             "per_second": 20
@@ -275,46 +236,7 @@
                         }
                     }
                 },
-                {
-                    "hdf": {
-                        "dataset": {
-                            "mca_{chan_1}": {
-                                "datatype": "uint32",
-                                "chunks": [
-                                    256,
-                                    1,
-                                    4096
-                                ],
-                                "dims": [
-                                    1,
-                                    4096
-                                ],
-                                "compression": "blosc",
-                                "indexes": true
-                            }
-                        }
-                    }
-                },
-                {
-                    "hdf": {
-                        "dataset": {
-                            "mca_{chan_2}": {
-                                "datatype": "uint32",
-                                "chunks": [
-                                    256,
-                                    1,
-                                    4096
-                                ],
-                                "dims": [
-                                    1,
-                                    4096
-                                ],
-                                "compression": "blosc",
-                                "indexes": true
-                            }
-                        }
-                    }
-                }
+                {{ mca_datasets }}
             ]
         }
     },
@@ -353,8 +275,8 @@
                 },
                 {
                     "xspress-list": {
-                        "channels": {list_channels},
-                        "frame_size": 4194304
+                        "channels": {{ channel_list }},
+                        "frame_size": {{ num_events_per_frame }}
                     }
                 },
                 {
@@ -362,24 +284,7 @@
                         "delete_datasets": true
                     }
                 },
-                {
-                    "hdf": {
-                        "dataset": {
-                            "raw_{chan_1}": {
-                                "datatype": "uint64",
-                                "chunks": [
-                                    524280
-                                ]
-                            },
-                            "raw_{chan_2}": {
-                                "datatype": "uint64",
-                                "chunks": [
-                                    524280
-                                ]
-                            }
-                        }
-                    }
-                }
+                {{ list_mode_datasets }}
             ]
         }
     }

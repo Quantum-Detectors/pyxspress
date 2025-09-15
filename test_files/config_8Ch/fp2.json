@@ -38,7 +38,7 @@
             "load": {
                 "index": "offset",
                 "name": "OffsetAdjustmentPlugin",
-                "library":  "/odin/prefix/lib/libOffsetAdjustmentPlugin.so"
+                "library": "/odin/prefix/lib/libOffsetAdjustmentPlugin.so"
             }
         }
     },
@@ -47,7 +47,7 @@
             "load": {
                 "index": "param",
                 "name": "ParameterAdjustmentPlugin",
-                "library":  "/odin/prefix/lib/libParameterAdjustmentPlugin.so"
+                "library": "/odin/prefix/lib/libParameterAdjustmentPlugin.so"
             }
         }
     },
@@ -144,13 +144,7 @@
                     ],
                     "compression": "blosc",
                     "indexes": true
-                }
-            }
-        }
-    },
-    {
-        "hdf": {
-            "dataset": {
+                },
                 "mca_3": {
                     "datatype": "uint32",
                     "chunks": [
@@ -261,7 +255,9 @@
                         "dataset": {
                             "uid": {
                                 "datatype": "uint64",
-                                "chunks": [1000]
+                                "chunks": [
+                                    1000
+                                ]
                             }
                         }
                     }
@@ -291,13 +287,7 @@
                                 ],
                                 "compression": "blosc",
                                 "indexes": true
-                            }
-                        }
-                    }
-                },
-                {
-                    "hdf": {
-                        "dataset": {
+                            },
                             "mca_3": {
                                 "datatype": "uint32",
                                 "chunks": [
@@ -353,8 +343,11 @@
                 },
                 {
                     "xspress-list": {
-                        "channels": [2, 3],
-                        "frame_size": 4194304
+                        "channels": [
+                            2,
+                            3
+                        ],
+                        "frame_size": 524280
                     }
                 },
                 {
@@ -365,14 +358,50 @@
                 {
                     "hdf": {
                         "dataset": {
-                            "raw_2": {
+                            "ch2_time_frame": {
                                 "datatype": "uint64",
                                 "chunks": [
                                     524280
                                 ]
                             },
-                            "raw_3": {
+                            "ch2_time_stamp": {
                                 "datatype": "uint64",
+                                "chunks": [
+                                    524280
+                                ]
+                            },
+                            "ch2_event_height": {
+                                "datatype": "uint16",
+                                "chunks": [
+                                    524280
+                                ]
+                            },
+                            "ch2_reset_flag": {
+                                "datatype": "uint8",
+                                "chunks": [
+                                    524280
+                                ]
+                            },
+                            "ch3_time_frame": {
+                                "datatype": "uint64",
+                                "chunks": [
+                                    524280
+                                ]
+                            },
+                            "ch3_time_stamp": {
+                                "datatype": "uint64",
+                                "chunks": [
+                                    524280
+                                ]
+                            },
+                            "ch3_event_height": {
+                                "datatype": "uint16",
+                                "chunks": [
+                                    524280
+                                ]
+                            },
+                            "ch3_reset_flag": {
+                                "datatype": "uint8",
                                 "chunks": [
                                     524280
                                 ]

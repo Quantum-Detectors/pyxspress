@@ -8,6 +8,35 @@ The format is based on `Keep a Changelog
 Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
 
+0.6.0
+-----
+
+Changed:
+
+- FP JSON config now generated using Jinja2 template
+- Changed list mode datasets per channel from `raw_{ch}` to separate out each
+  field:
+
+  - `{ch}_time_frame` for the time frame
+  - `{ch}_time_stamp` for the time stamp
+  - `{ch}_event_height` for the event height
+  - `{ch}_reset_flag` to show if the event describes a reset
+
+- Changed default filename to `example` without HDF5 extension as this parameter
+  is treated as a prefix rather than a full path.
+- Acquisition script now checks the detector's acquire mode and only sets
+  chunking if in MCA mode.
+- The list mode plugin frame size is now set to be the same number of elements as
+  the a single chunk in the HDF dataset. Data would be lost if these values did not
+  match (in terms of number of elements, not bytes)
+- Updated the xspress list file reader to support the new separate datasets format
+
+Fixed:
+
+- Acquisition script now uses number of cards of system to calculate the expected
+  number of images saved
+
+
 0.5.1
 -----
 

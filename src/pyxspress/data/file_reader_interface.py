@@ -19,7 +19,7 @@ class DatasetKey(Enum):
     """Dataset keys for channel data"""
 
     MCA = "mca"
-    List = "raw"
+    List = "event_height"
     Undefined = "Undefined"
 
 
@@ -92,28 +92,15 @@ class FileReaderInterface(Loggable, ABC):
             self.logger.error(f"Could not find file {meta_file_name}. Does it exist?")
             return False
 
+        self.logger.info(f"Opening files: {channel_file_names}")
+
         # Now close any existing files
         self.close_files()
 
         # Channel data
         file_index = 0
         for file_name in channel_file_names:
-            file = h5py.File(file_name)
-
-            datasets = [key for key in file.keys() if self.dataset_key.value in key]
-            self.file_datasets[file_index] = datasets
-
-            channels = [
-                int(dataset.replace(f"{self.dataset_key.value}_", ""))
-                for dataset in datasets
-            ]
-            for channel in channels:
-                self.channel_map_to_file_index[channel] = file_index
-
-            self.num_channels += len(channels)
-            self.channels.extend(channels)
-            self.file_list.append(file)
-
+            self.open_data_file(file_index, file_name)
             file_index += 1
 
         # Metadata
@@ -144,11 +131,27 @@ class FileReaderInterface(Loggable, ABC):
         return True
 
     @abstractmethod
+    def open_data_file(self, file_index: int, file_name: str):
+        """Open a single data file (i.e. not metadata)
+
+        This should parse the files and:
+
+        - Get the list of channels
+        - Add number of channels in file to overall sum
+        - Set the mapping of channel to file index
+        - Append file to file list
+
+        Args:
+            file_index (int): Index of file in list
+            file_name (str): File name
+        """
+
+    @abstractmethod
     def get_num_frames(self) -> int:
         """Get the number of time frames in the file
 
         Returns:
-            int: _description_
+            int: Number of frames in file
         """
 
     @abstractmethod
