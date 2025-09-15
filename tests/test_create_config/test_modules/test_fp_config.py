@@ -5,6 +5,8 @@ from pyxspress.create_config.modules.fp_config import (
     create_fp_launch_script,
 )
 
+from .util import get_8ch_file_string
+
 
 @patch("os.chmod")
 def test_create_fp_launch_script(mock_chmod, tmp_path, template_dir) -> None:
@@ -31,17 +33,20 @@ def test_create_fp_launch_script(mock_chmod, tmp_path, template_dir) -> None:
 
 def test_create_fp_config_file(tmp_path, template_dir) -> None:
     # Setup
-    num_cards = 2
+    num_cards = 4
     target_dir = tmp_path
 
-    # call function
     create_fp_config_file(num_cards, template_dir, target_dir)
 
     for card in range(num_cards):
+        # Check that we generated 1 processor config per card
         assert (target_dir / f"fp{card + 1}.json").exists()
         text = (target_dir / f"fp{card + 1}.json").read_text()
-        assert "{}" not in text  # no placeholders left
-        num = f"{(10 * card) + 2:03d}"
-        assert f'"fr_release_cnxn": "tcp://127.0.0.1:10{num}"' in text
-        list_channels = f"[{card * 2}, {(card * 2) + 1}]"
-        assert f'"channels": {list_channels},' in text
+
+        # Check no substitutions remain
+        assert "{{" not in text
+        assert "}}" not in text
+
+        # Compare to our example test files
+        expected_contents = get_8ch_file_string(f"fp{card + 1}.json")
+        assert text == expected_contents

@@ -25,7 +25,7 @@ logger = logging.getLogger("pyadodin")
 logger.setLevel(logging.INFO)
 logger.addHandler(console_handler)
 
-base_pv_name = "XSPRESS:CAM"
+base_det_pv_name = "XSPRESS:CAM"
 base_file_pv_name = "XSPRESS:OD"
 
 
@@ -93,12 +93,12 @@ def main(
     # Set up acquisition
     reset_state()
 
-    caput(f"{base_pv_name}:AcquireTime", acquire_time)
-    caput(f"{base_pv_name}:NumImages", images)
-    caput(f"{base_pv_name}:TriggerMode", trigger_mode)
+    caput(f"{base_det_pv_name}:AcquireTime", acquire_time)
+    caput(f"{base_det_pv_name}:NumImages", images)
+    caput(f"{base_det_pv_name}:TriggerMode", trigger_mode)
 
     if file_name is not None:
-        setup_file_writing(file_dir, file_name, images, acquire_time)
+        setup_file_writing(file_dir, file_name, images)
 
     # Monitor detector state transitions
     acquire_event = Event()
@@ -120,7 +120,7 @@ def main(
             acquire_event.clear()
             idle_event.set()
 
-    camonitor(f"{base_pv_name}:DetectorState_RBV", callback=detector_state_monitor)
+    camonitor(f"{base_det_pv_name}:DetectorState_RBV", callback=detector_state_monitor)
 
     # Monitor buffers free
     buffer_monitors = setup_buffer_monitors(2)
@@ -146,13 +146,13 @@ def main(
         pyplot.ion()
 
         # Stop monitors
-        camonitor_clear(f"{base_pv_name}:DetectorState_RBV")
+        camonitor_clear(f"{base_det_pv_name}:DetectorState_RBV")
         for monitor in buffer_monitors:
             monitor.clear_monitor()
 
         # Plot
         if file_name is not None and write_success is True:
-            num_channels = caget(f"{base_pv_name}:MAX_NUM_CHANNELS_RBV")
+            num_channels = caget(f"{base_det_pv_name}:MAX_NUM_CHANNELS_RBV")
             plot_data(file_dir, file_name, images, plot_all, num_channels)
 
         create_buffer_monitor_plot(buffer_monitors)
@@ -163,16 +163,16 @@ def main(
 
 def connect_and_configure_check():
     # Check we are connected
-    if caget(f"{base_pv_name}:CONNECTED") == 0:
+    if caget(f"{base_det_pv_name}:CONNECTED") == 0:
         raise ValueError("Odin not connected to Xspress")
-    elif caget(f"{base_pv_name}:RECONNECT_REQUIRED") == 1:
+    elif caget(f"{base_det_pv_name}:RECONNECT_REQUIRED") == 1:
         logger.info("Reconfigure required - reconfiguring")
-        caput(f"{base_pv_name}:RECONFIGURE", 1, wait=True)
+        caput(f"{base_det_pv_name}:RECONFIGURE", 1, wait=True)
 
         logger.info("Waiting for Odin to reconnect")
         connect_timeout = 5
         waited_time = 0.0
-        while caget(f"{base_pv_name}:CONNECTED") == 0:
+        while caget(f"{base_det_pv_name}:CONNECTED") == 0:
             time.sleep(0.1)
             waited_time += 0.1
 
@@ -184,24 +184,20 @@ def connect_and_configure_check():
 
 def reset_state():
     """Reset the state of Odin to make sure the system is idle"""
-    if caget(f"{base_pv_name}:Acquire") == 1:
-        caput(f"{base_pv_name}:Acquire", 0, wait=True)
+    if caget(f"{base_det_pv_name}:Acquire") == 1:
+        caput(f"{base_det_pv_name}:Acquire", 0, wait=True)
 
     if caget(f"{base_file_pv_name}:Capture") == 1:
         caput(f"{base_file_pv_name}:Capture", 0, wait=True)
 
 
-def setup_file_writing(
-    file_dir: str, file_name: str, num_images: int, acquire_time: float
-):
+def setup_file_writing(file_dir: str, file_name: str, num_images: int):
     """Set up the file writing
 
     Args:
         file_dir (str): File directory to write data to
         file_name (str): Base file name
         num_images (int): Number of images
-        acquire_time (float): Acquisition time. Used to determine chunking
-
 
     Raises:
         ValueError: Exception if target filenames already exist
@@ -224,15 +220,13 @@ def setup_file_writing(
     caput(f"{base_file_pv_name}:ImageHeight", 1)
     caput(f"{base_file_pv_name}:ImageWidth", 4096)
 
-    # TODO: work out why chunking makes data sad part way through
-    # frame_chunking = max(int(1 / acquire_time), 1)
-    frame_chunking = 1
-    logger.info(f"Frames per chunk: {frame_chunking}")
-
-    caput(f"{base_file_pv_name}:NumFramesChunks", frame_chunking)
-    caput(f"{base_file_pv_name}:NumFramesChunks", 1)
-    caput(f"{base_file_pv_name}:NumRowChunks", 1)
-    caput(f"{base_file_pv_name}:NumColChunks", 4096)
+    # Configure the chunking to make sure MCA mode is correct
+    acquire_mode = caget(f"{base_det_pv_name}:MODE_RBV", as_string=True)
+    if acquire_mode == "mca":
+        logger.info(f"Configuring chunking for list mode: {acquire_mode}")
+        caput(f"{base_file_pv_name}:NumFramesChunks", 1)
+        caput(f"{base_file_pv_name}:NumRowChunks", 1)
+        caput(f"{base_file_pv_name}:NumColChunks", 4096)
 
     # Start the file writer and wait for it to be ready
     caput(f"{base_file_pv_name}:Capture", 1, wait=True, timeout=5)
@@ -241,7 +235,7 @@ def setup_file_writing(
 def acquire():
     """Request the acquisition to begin"""
     logger.info("Starting acquisition")
-    caput(f"{base_pv_name}:Acquire", 1)
+    caput(f"{base_det_pv_name}:Acquire", 1)
     time.sleep(2.0)  # Wait due to counter not resetting :(
 
 
@@ -264,11 +258,13 @@ def wait_acquisition_complete(images: int, acquire_time: float):
     poll_interval = 0.2
     next_update_percent = 10  # Log update every 10%
 
-    acquired_images = caget(f"{base_pv_name}:ArrayCounter_RBV")
+    acquired_images = caget(f"{base_det_pv_name}:ArrayCounter_RBV")
+    assert acquired_images is not None, "Failed to get acquired images"
     while acquired_images < images:
         time.sleep(poll_interval)
         time_waited += poll_interval
-        acquired_images = caget(f"{base_pv_name}:ArrayCounter_RBV")
+        acquired_images = caget(f"{base_det_pv_name}:ArrayCounter_RBV")
+        assert acquired_images is not None, "Failed to get acquired images"
 
         if acquired_images / images > next_update_percent / 100.0:
             logger.info(f" - {next_update_percent}% complete")
@@ -337,13 +333,24 @@ def wait_file_writing_complete(images: int) -> bool:
 
     logger.info(" - Files closed")
 
-    # Check the number of images written - 2 file writers create twice the number of
-    # "half" images
-    if written_images != 2 * images:
-        logger.error(f"Wrote {written_images} half-images when {2 * images} expected")
-        return False
+    # Check the number of images written - this number should be the number of
+    # overall frames acquired multiplied by the number of FR/FP pairs, which is
+    # currently equal to the number of cards
+    num_cards = caget(f"{base_det_pv_name}:NUM_CARDS_RBV")
+    if num_cards is not None:
+        expected_partial_images = images * num_cards
+        if written_images != expected_partial_images:
+            logger.error(
+                f"Wrote {written_images} partial images when "
+                f"{expected_partial_images} expected"
+            )
+            return False
+        else:
+            logger.info(f"File saving complete. Wrote {written_images} partial frames")
+            return True
     else:
-        logger.info("File saving complete")
+        # Skip check but assume we succeeded
+        logger.warning("Could not determine number of cards for checking saved images")
         return True
 
 

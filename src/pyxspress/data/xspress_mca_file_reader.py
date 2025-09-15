@@ -4,6 +4,7 @@ Xspress MCA file reader module
 File reader which can open HDF5 files produced in MCA mode by Odin
 """
 
+import h5py
 import numpy
 
 from pyxspress.data import DatasetKey, FileReaderInterface
@@ -12,6 +13,36 @@ from pyxspress.data import DatasetKey, FileReaderInterface
 class XspressMCAFileReader(FileReaderInterface):
     def __init__(self) -> None:
         super().__init__(dataset_key=DatasetKey.MCA)
+
+    def open_data_file(self, file_index: int, file_name: str):
+        """Open a single data file (i.e. not metadata)
+
+        This should parse the files and:
+
+        - Get the list of channels
+        - Add number of channels in file to overall sum
+        - Set the mapping of channel to file index
+        - Append file to file list
+
+        Args:
+            file_index (int): Index of file in list
+            file_name (str): File name
+        """
+        file = h5py.File(file_name)
+
+        datasets = [key for key in file.keys() if self.dataset_key.value in key]
+        self.file_datasets[file_index] = datasets
+
+        channels = [
+            int(dataset.replace(f"{self.dataset_key.value}_", ""))
+            for dataset in datasets
+        ]
+        for channel in channels:
+            self.channel_map_to_file_index[channel] = file_index
+
+        self.num_channels += len(channels)
+        self.channels.extend(channels)
+        self.file_list.append(file)
 
     def get_num_frames(self) -> int:
         """Get the number of time frames
