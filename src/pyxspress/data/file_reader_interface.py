@@ -113,7 +113,7 @@ class FileReaderInterface(Loggable, ABC):
         self.meta_filename = meta_file_name
 
         # Get number of frames last after files have been opened
-        self.num_frames = self.get_num_frames()
+        self.set_num_frames()
 
         self.logger.info(
             "Parsed files:\n"
@@ -147,12 +147,8 @@ class FileReaderInterface(Loggable, ABC):
         """
 
     @abstractmethod
-    def get_num_frames(self) -> int:
-        """Get the number of time frames in the file
-
-        Returns:
-            int: Number of frames in file
-        """
+    def set_num_frames(self):
+        """Set the number of time frames in the file"""
 
     @abstractmethod
     def get_channel_data(self, channels: int | list[int], frame: int) -> numpy.ndarray:

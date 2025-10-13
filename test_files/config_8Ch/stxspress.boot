@@ -42,15 +42,13 @@ dbpf "XSPRESS:OD:ReadStatus.SCAN", "7"
 dbpf "XSPRESS:CAM:ReadStatus.SCAN", "7"
 dbpf "XSPRESS:CAM:LiveViewEndpoint", "tcp://127.0.0.1:15510"
 
-# -------------------------------------------
-# TODO: tidy up below commands before release
-# -------------------------------------------
-
-dbpf "XSPRESS:CAM:RUN_FLAGS", "2"
 dbpf "XSPRESS:CAM:TriggerMode", "2"
 
 dbpf "XSPRESS:OD:FilePath", "/data/odin-testing"
 dbpf "XSPRESS:OD:FileName", "example"
+
+# -------------------------------------------
+# Reconfigure and wait to reconnect
 # -------------------------------------------
 
 dbpf "XSPRESS:CAM:RECONFIGURE", "1"

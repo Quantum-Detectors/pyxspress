@@ -23,7 +23,6 @@ dynamic = ["version"]
 [project.optional-dependencies]
 # Required for the plotting and GUI
 cli = [
-    "click",
     "h5py",
     "hdf5plugin",
     "importlib-metadata",
@@ -32,6 +31,7 @@ cli = [
     "pyepics",
     "pyqt5",
     "PySide6",
+    "rich",
 ]
 # Required packages for development
 dev = [
@@ -57,8 +57,9 @@ Homepage = "https://gitlab.com/qd-xspress3/pyxspress"
 [project.scripts]
 xspress-acquire = "pyxspress.cli.acquisition:main"
 xspress-create-config = "pyxspress.cli.create_config:main"
-xspress-list-mode-listener = "pyxspress.cli.list_mode_listener:main"
+xspress-list-mode-check = "pyxspress.cli.list_mode_data_check:main"
 xspress-list-mode-decode = "pyxspress.cli.list_mode_decode:main"
+xspress-list-mode-listener = "pyxspress.cli.list_mode_listener:main"
 xspress-plot = "pyxspress.cli.plot_data:main"
 xspress-view = "pyxspress.cli.data_gui:main"
 
