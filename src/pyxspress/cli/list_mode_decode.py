@@ -22,14 +22,14 @@ from pyxspress.util.util import setup_basic_logging
     "--channel",
     type=int,
     default=None,
-    help="Channel number (of card) or -1 for all channels",
+    help="Channel number (of card) or omit for all channels",
 )
 @click.option(
     "-tf",
     "--time_frame",
     type=int,
     default=None,
-    help="Time frame number (based on system framing). None to get all frames",
+    help="Time frame number (based on system framing). Omit to get all frames",
 )
 @click.option(
     "-o", "--output_file", type=str, default=None, help="Path to write time frame data"
@@ -54,6 +54,10 @@ def main(filename: str, channel: int | None, time_frame: int, output_file: str):
     time_frames = decoder.decode_file_into_time_frames(filename, channel=channel)
 
     if output_file:
+        if output_file[-3:] != ".h5" and output_file[-5:] != ".hdf5":
+            # Make sure there is always a suffix
+            output_file += ".h5"
+
         writer = ListModeWriter(output_file)
         writer.write_frames(time_frames, channel=channel)
 

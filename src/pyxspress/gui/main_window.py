@@ -4,9 +4,6 @@ Main window
 The main window of the application
 """
 
-import glob
-import os
-
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIntValidator, QPixmap
 from PySide6.QtWidgets import (
@@ -25,7 +22,11 @@ from PySide6.QtWidgets import (
 )
 
 from pyxspress import __version__
-from pyxspress.data import FileReaderInterface, get_file_reader
+from pyxspress.data import (
+    FileReaderInterface,
+    get_file_reader,
+    get_matching_xspress_files,
+)
 from pyxspress.gui import LineChartWidget
 from pyxspress.gui.util import get_image_path
 from pyxspress.util import Loggable
@@ -385,25 +386,7 @@ class MainWindow(QMainWindow, Loggable):
         self.file_reader = get_file_reader(file_name)
 
         # Get companion HDF5 files if we have pattern
-        suffix_pattern = "_000000.h5"
-        meta_file: str | None = None
-        if suffix_pattern in file_name:
-            # Channel files
-            file_prefix = file_name.split(suffix_pattern)[0][:-1]
-            file_pattern = f"{file_prefix}*{suffix_pattern}"
-            self.logger.info(f"Looking for files matching pattern: {file_pattern}")
-            file_list = sorted(glob.glob(file_pattern))
-            self.logger.info(f"Found files: {file_list}")
-            assert len(file_list) > 0, "Did not find matching files"
-
-            # Metadata file
-            meta_file_name = f"{file_prefix}meta.h5"
-            if os.path.exists(meta_file_name):
-                self.logger.info(f"Found metadata file: {meta_file_name}")
-                meta_file = meta_file_name
-
-        else:
-            file_list = [file_name]
+        file_list, meta_file = get_matching_xspress_files(file_name)
 
         if self.file_reader.open_files(file_list, meta_file):
             self.total_frames_in_file.setText(f" / {self.file_reader.num_frames}")

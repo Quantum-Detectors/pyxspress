@@ -6,10 +6,13 @@ format that will be used for Odin.
 """
 
 import os
+from time import time
 
 import h5py
 import numpy
+from rich.progress import track
 
+from pyxspress.data.xspress_list_file_reader import ListDataset
 from pyxspress.list_mode.list_mode_decoder import TimeFrame
 from pyxspress.util import Loggable
 
@@ -24,44 +27,24 @@ class ListModeWriter(Loggable):
         self.file_path = file_path
         self.file = h5py.File(self.file_path, "w")
 
-    def write_frame(self, channel: int, frame: TimeFrame):
-        """Write events from a single frame to the HDF5 file
+    def __create_dataset(self, channel: int, dataset: ListDataset, size: int) -> None:
+        # Get full dataset name
+        dataset_name = f"ch{channel}_{dataset.value}"
 
-        The events will be added to the dataset for a specific channel
+        if dataset_name in self.file:
+            self.logger.warning(f"Dataset {dataset} already exists")
+            return
 
-        Args:
-            channel (int): Channel number on ADC card
-            frame (TimeFrame): Time frame
-        """
-        self.logger.debug(f"Writing frame {frame.time_frame}")
+        dataset_type: type[numpy.unsignedinteger]
+        match dataset:
+            case ListDataset.TimeFrame | ListDataset.TimeStamp:
+                dataset_type = numpy.uint64
+            case ListDataset.EventHeight:
+                dataset_type = numpy.uint16
+            case ListDataset.ResetFlag:
+                dataset_type = numpy.uint8
 
-        # Create the numpy array with the correct structure
-        row_data_type = numpy.dtype(
-            [
-                ("Time frame", numpy.uint64),
-                ("Time stamp", numpy.uint64),
-                ("Event height", numpy.uint16),
-                ("Reset", bool),
-            ]
-        )
-        frame_data = numpy.empty(len(frame.events), dtype=row_data_type)
-        frame_data[:]["Time frame"] = frame.time_frame
-        frame_data[:]["Time stamp"] = [event.time_stamp for event in frame.events]
-        frame_data[:]["Event height"] = [event.event_height for event in frame.events]
-        frame_data[:]["Reset"] = [event.reset for event in frame.events]
-
-        dataset_name = f"ch{channel}-events"
-        if dataset_name not in self.file:
-            # Dataset doesn't exist
-            self.file.create_dataset(dataset_name, data=frame_data, maxshape=(None,))
-
-        else:
-            # Extend existing dataset
-            dataset = self.file[dataset_name]
-            dataset.resize(dataset.size + frame_data.shape[0], axis=0)
-            dataset[-frame_data.shape[0] :] = frame_data
-
-        self.logger.info(f"Wrote frame {frame.time_frame} to file")
+        self.file.create_dataset(dataset_name, shape=(size,), dtype=dataset_type)
 
     def write_frames(
         self, frames: dict[int, list[TimeFrame]], channel: int | None = None
@@ -79,14 +62,12 @@ class ListModeWriter(Loggable):
         Returns:
             bool: True if file writing was successful
         """
+        start_time = time()
+
         # Write all channels
         if channel is None:
             for channel in frames:
-                self.logger.info(
-                    f"Writing {len(frames[channel])} frames for channel {channel}"
-                )
-                for frame in frames[channel]:
-                    self.write_frame(channel, frame)
+                self.write_frames(frames, channel=channel)
 
         # Single channel
         else:
@@ -99,7 +80,161 @@ class ListModeWriter(Loggable):
             self.logger.info(
                 f"Writing {len(frames[channel])} frames for channel {channel}"
             )
+            # Create datasets with correct size
+            total_channel_events = 0
             for frame in frames[channel]:
-                self.write_frame(channel, frame)
+                total_channel_events += len(frame.events)
+
+            self.logger.info(f"Channel {channel} total events: {total_channel_events}")
+            self.__create_dataset(
+                channel, ListDataset.TimeFrame, size=total_channel_events
+            )
+            self.__create_dataset(
+                channel, ListDataset.TimeStamp, size=total_channel_events
+            )
+            self.__create_dataset(
+                channel, ListDataset.EventHeight, size=total_channel_events
+            )
+            self.__create_dataset(
+                channel, ListDataset.ResetFlag, size=total_channel_events
+            )
+
+            timestamp_dataset = f"ch{channel}_{ListDataset.TimeStamp.value}"
+            timeframe_dataset = f"ch{channel}_{ListDataset.TimeFrame.value}"
+            event_height_dataset = f"ch{channel}_{ListDataset.EventHeight.value}"
+            reset_flag_dataset = f"ch{channel}_{ListDataset.ResetFlag.value}"
+
+            # Create initial buffers
+            buffer_size = 1000000
+            events_in_buffer = 0
+            timestamp_buffer = numpy.empty(buffer_size, dtype=numpy.uint64)
+            timeframe_buffer = numpy.empty(buffer_size, dtype=numpy.uint64)
+            event_height_buffer = numpy.empty(buffer_size, dtype=numpy.uint16)
+            reset_flag_buffer = numpy.empty(buffer_size, dtype=numpy.uint8)
+
+            # Track remaning events when buffer is full
+            remaining_events = 0
+
+            # Track file index
+            file_index = 0
+            # for frame in frames[channel]:
+            for frame in track(frames[channel], description="Writing..."):
+                # Buffer up events
+                num_events = len(frame.events)
+                if events_in_buffer + num_events <= buffer_size:
+                    # Can fit all events from frame into our buffer
+                    timestamp_buffer[
+                        events_in_buffer : events_in_buffer + num_events
+                    ] = [event.time_stamp for event in frame.events]
+                    timeframe_buffer[
+                        events_in_buffer : events_in_buffer + num_events
+                    ] = [event.time_frame for event in frame.events]
+                    event_height_buffer[
+                        events_in_buffer : events_in_buffer + num_events
+                    ] = [event.event_height for event in frame.events]
+                    reset_flag_buffer[
+                        events_in_buffer : events_in_buffer + num_events
+                    ] = [event.reset for event in frame.events]
+
+                    events_in_buffer += num_events
+                else:
+                    # Can only fit some of the events - fill up the current
+                    # buffer and track the remainder
+                    buffer_space = buffer_size - events_in_buffer
+                    self.logger.debug(f"Filling up to buffer space: {buffer_space}")
+
+                    timestamp_buffer[
+                        events_in_buffer : events_in_buffer + buffer_space
+                    ] = [event.time_stamp for event in frame.events[:buffer_space]]
+                    timeframe_buffer[
+                        events_in_buffer : events_in_buffer + buffer_space
+                    ] = [event.time_frame for event in frame.events[:buffer_space]]
+                    event_height_buffer[
+                        events_in_buffer : events_in_buffer + buffer_space
+                    ] = [event.event_height for event in frame.events[:buffer_space]]
+                    reset_flag_buffer[
+                        events_in_buffer : events_in_buffer + buffer_space
+                    ] = [event.reset for event in frame.events[:buffer_space]]
+
+                    events_in_buffer += buffer_space
+                    remaining_events = num_events - buffer_space
+                    self.logger.debug(f"Remaining events: {remaining_events}")
+
+                # Check if buffer is full
+                if events_in_buffer == buffer_size:
+                    self.logger.debug("Buffer is full")
+
+                    # Write to file
+                    self.file[timestamp_dataset][
+                        file_index : file_index + buffer_size
+                    ] = timestamp_buffer
+                    self.file[timeframe_dataset][
+                        file_index : file_index + buffer_size
+                    ] = timeframe_buffer
+                    self.file[event_height_dataset][
+                        file_index : file_index + buffer_size
+                    ] = event_height_buffer
+                    self.file[reset_flag_dataset][
+                        file_index : file_index + buffer_size
+                    ] = reset_flag_buffer
+                    file_index += buffer_size
+
+                    # Create next buffers
+                    events_in_buffer = 0
+                    timestamp_buffer = numpy.empty(buffer_size, dtype=numpy.uint64)
+                    timeframe_buffer = numpy.empty(buffer_size, dtype=numpy.uint64)
+                    event_height_buffer = numpy.empty(buffer_size, dtype=numpy.uint16)
+                    reset_flag_buffer = numpy.empty(buffer_size, dtype=numpy.uint8)
+
+                    # Check for remaining events left over from filling buffer
+                    if remaining_events > 0:
+                        self.logger.debug(
+                            f"Adding remaining {remaining_events} events to new buffer"
+                        )
+
+                        timestamp_buffer[0:remaining_events] = [
+                            event.time_stamp
+                            for event in frame.events[-remaining_events:]
+                        ]
+                        timeframe_buffer[0:remaining_events] = [
+                            event.time_frame
+                            for event in frame.events[-remaining_events:]
+                        ]
+                        event_height_buffer[0:remaining_events] = [
+                            event.event_height
+                            for event in frame.events[-remaining_events:]
+                        ]
+                        reset_flag_buffer[0:remaining_events] = [
+                            event.reset for event in frame.events[-remaining_events:]
+                        ]
+
+                        events_in_buffer += remaining_events
+                        remaining_events = 0
+                        self.logger.debug(
+                            f"Remaining events filled: {events_in_buffer}"
+                        )
+
+                        # TODO: what to do if number of events exceeds buffer size?
+
+            # We have finished iterating through all frames but we may still
+            # have events left in the buffer
+            if events_in_buffer > 0:
+                self.logger.debug(f"Writing remaining {events_in_buffer} events")
+
+                self.file[timestamp_dataset][
+                    file_index : file_index + events_in_buffer
+                ] = timestamp_buffer[:events_in_buffer]
+                self.file[timeframe_dataset][
+                    file_index : file_index + events_in_buffer
+                ] = timeframe_buffer[:events_in_buffer]
+                self.file[event_height_dataset][
+                    file_index : file_index + events_in_buffer
+                ] = event_height_buffer[:events_in_buffer]
+                self.file[reset_flag_dataset][
+                    file_index : file_index + events_in_buffer
+                ] = reset_flag_buffer[:events_in_buffer]
+
+        elapsed_time = time() - start_time
+        self.logger.info(f"Wrote in {elapsed_time:<.3f}s")
 
         return True

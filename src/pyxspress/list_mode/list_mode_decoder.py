@@ -160,7 +160,7 @@ class ListModeDecoder(Loggable):
                             tcp_frame_event_index
                         ].time_frame
 
-                        # Sanity check
+                        # Sanity checks
                         if new_time_frame < time_frames[tcp_chan][-1].time_frame:
                             self.logger.error(
                                 f"New time frame number {new_time_frame} is less"
@@ -183,7 +183,7 @@ class ListModeDecoder(Loggable):
             self.logger.info(f"Channel {channel} frames: {len(time_frames[channel])}")
 
             for time_frame in time_frames[channel]:
-                self.logger.info(
+                self.logger.debug(
                     f" - frame {time_frame.time_frame}: "
                     f"{time_frame.num_events} events, "
                     f"{time_frame.num_resets} resets, "
@@ -244,7 +244,6 @@ class ListModeDecoder(Loggable):
         ttl_b = 0
         dummy_event = 0
         time_frame = 0
-        channel_number = -1
         time_stamp = 0
 
         num_events = 0
@@ -292,7 +291,7 @@ class ListModeDecoder(Loggable):
 
                     # Check if we want a specific channel
                     if requested_channel is not None:
-                        if channel_number != requested_channel:
+                        if frame.channel != requested_channel:
                             return None
 
                 case 10:

@@ -44,15 +44,11 @@ class XspressMCAFileReader(FileReaderInterface):
         self.channels.extend(channels)
         self.file_list.append(file)
 
-    def get_num_frames(self) -> int:
-        """Get the number of time frames
-
-        Returns:
-            int: Number of frames
-        """
+    def set_num_frames(self):
+        """Set the number of time frames"""
         assert len(self.file_list) > 0, "Need to open file first"
         # Number of frames from first file and first dataset
-        return len(self.file_list[0][self.file_datasets[0][0]])
+        self.num_frames = len(self.file_list[0][self.file_datasets[0][0]])
 
     def get_channel_data(self, channels: int | list[int], frame: int) -> numpy.ndarray:
         """Get data of a single frame for either a single channel or all channels

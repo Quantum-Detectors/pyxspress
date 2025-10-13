@@ -8,6 +8,31 @@ The format is based on `Keep a Changelog
 Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
 
+0.7.0
+-----
+
+Added:
+
+- Add CLI option `xspress-list-mode-check` to check the ordering of events in
+  a saved Odin list mode acquisition
+- Added example MCA data files to test with `xspress-view` GUI
+
+Changed:
+
+- Changed XSP3READOUT variable to frames inside `stControlServer.sh` control
+  server launch script to optimise default readout mode for frames
+- `xspress-list-mode-decode` now decodes the Python TCP files using HDF5 dataset
+  names consistent with the Odin process plugins. This means you can open these
+  files using `xspress-view` as with Odin-produced data
+- Changed default run flags in IOC boot template to just Scalers and Hist (i.e.
+  remove playback)
+
+Fixed:
+
+- Fixed issue with checking the channel of a TCP packet in the ListModeDecoder
+  class matches a requested channel
+
+
 0.6.0
 -----
 
