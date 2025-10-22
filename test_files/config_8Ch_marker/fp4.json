@@ -1,10 +1,10 @@
 [
     {
         "fr_setup": {
-            "fr_ready_cnxn": "tcp://127.0.0.1:{{ ready_port }}",
-            "fr_release_cnxn": "tcp://127.0.0.1:{{ release_port }}"
+            "fr_ready_cnxn": "tcp://127.0.0.1:10031",
+            "fr_release_cnxn": "tcp://127.0.0.1:10032"
         },
-        "meta_endpoint": "tcp://*:{{ meta_port }}"
+        "meta_endpoint": "tcp://*:10038"
     },
     {
         "plugin": {
@@ -38,7 +38,7 @@
             "load": {
                 "index": "offset",
                 "name": "OffsetAdjustmentPlugin",
-                "library":  "/odin/prefix/lib/libOffsetAdjustmentPlugin.so"
+                "library": "/odin/prefix/lib/libOffsetAdjustmentPlugin.so"
             }
         }
     },
@@ -47,7 +47,7 @@
             "load": {
                 "index": "param",
                 "name": "ParameterAdjustmentPlugin",
-                "library":  "/odin/prefix/lib/libParameterAdjustmentPlugin.so"
+                "library": "/odin/prefix/lib/libParameterAdjustmentPlugin.so"
             }
         }
     },
@@ -124,14 +124,47 @@
                 "rank": 0
             },
             "file": {
-                "postfix": "{{ filename_postfix }}"
+                "postfix": "_D"
             }
         }
     },
-    {{ mca_datasets }},
     {
         "hdf": {
-            "master": "{{ master_mca_dataset }}"
+            "dataset": {
+                "mca_6": {
+                    "datatype": "uint32",
+                    "chunks": [
+                        256,
+                        1,
+                        4096
+                    ],
+                    "dims": [
+                        1,
+                        4096
+                    ],
+                    "compression": "blosc",
+                    "indexes": true
+                },
+                "mca_7": {
+                    "datatype": "uint32",
+                    "chunks": [
+                        256,
+                        1,
+                        4096
+                    ],
+                    "dims": [
+                        1,
+                        4096
+                    ],
+                    "compression": "blosc",
+                    "indexes": true
+                }
+            }
+        }
+    },
+    {
+        "hdf": {
+            "master": "mca_7"
         }
     },
     {
@@ -141,7 +174,7 @@
     },
     {
         "view": {
-            "live_view_socket_addr": "tcp://0.0.0.0:{{ live_view_port }}",
+            "live_view_socket_addr": "tcp://0.0.0.0:15503",
             "dataset_name": "live",
             "frame_frequency": 0,
             "per_second": 20
@@ -222,7 +255,9 @@
                         "dataset": {
                             "uid": {
                                 "datatype": "uint64",
-                                "chunks": [1000]
+                                "chunks": [
+                                    1000
+                                ]
                             }
                         }
                     }
@@ -236,7 +271,40 @@
                         }
                     }
                 },
-                {{ mca_datasets }}
+                {
+                    "hdf": {
+                        "dataset": {
+                            "mca_6": {
+                                "datatype": "uint32",
+                                "chunks": [
+                                    256,
+                                    1,
+                                    4096
+                                ],
+                                "dims": [
+                                    1,
+                                    4096
+                                ],
+                                "compression": "blosc",
+                                "indexes": true
+                            },
+                            "mca_7": {
+                                "datatype": "uint32",
+                                "chunks": [
+                                    256,
+                                    1,
+                                    4096
+                                ],
+                                "dims": [
+                                    1,
+                                    4096
+                                ],
+                                "compression": "blosc",
+                                "indexes": true
+                            }
+                        }
+                    }
+                }
             ]
         }
     },
@@ -275,9 +343,11 @@
                 },
                 {
                     "xspress-list": {
-                        "channels": {{ channel_list }},
-                        {{ marker_string }}
-                        "frame_size": {{ num_events_per_frame }}
+                        "channels": [
+                            6,
+                            7
+                        ],
+                        "frame_size": 524280
                     }
                 },
                 {
@@ -285,7 +355,60 @@
                         "delete_datasets": true
                     }
                 },
-                {{ list_mode_datasets }}
+                {
+                    "hdf": {
+                        "dataset": {
+                            "ch6_time_frame": {
+                                "datatype": "uint64",
+                                "chunks": [
+                                    524280
+                                ]
+                            },
+                            "ch6_time_stamp": {
+                                "datatype": "uint64",
+                                "chunks": [
+                                    524280
+                                ]
+                            },
+                            "ch6_event_height": {
+                                "datatype": "uint16",
+                                "chunks": [
+                                    524280
+                                ]
+                            },
+                            "ch6_reset_flag": {
+                                "datatype": "uint8",
+                                "chunks": [
+                                    524280
+                                ]
+                            },
+                            "ch7_time_frame": {
+                                "datatype": "uint64",
+                                "chunks": [
+                                    524280
+                                ]
+                            },
+                            "ch7_time_stamp": {
+                                "datatype": "uint64",
+                                "chunks": [
+                                    524280
+                                ]
+                            },
+                            "ch7_event_height": {
+                                "datatype": "uint16",
+                                "chunks": [
+                                    524280
+                                ]
+                            },
+                            "ch7_reset_flag": {
+                                "datatype": "uint8",
+                                "chunks": [
+                                    524280
+                                ]
+                            }
+                        }
+                    }
+                }
             ]
         }
     }

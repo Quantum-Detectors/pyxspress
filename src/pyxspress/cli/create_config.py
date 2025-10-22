@@ -41,6 +41,13 @@ from pyxspress.util import setup_basic_logging
     help="Generation of Xspress 3X system (Mk1 or Mk2)",
 )
 @click.option(
+    "-mc",
+    "--marker_channels",
+    is_flag=True,
+    default=False,
+    help="Flag to use configuration including or not including marker channels",
+)
+@click.option(
     "-od",
     "--odin_dir",
     type=str,
@@ -69,7 +76,13 @@ from pyxspress.util import setup_basic_logging
     help="Print version and exit",
 )
 def main(
-    channels: int, mark: int, odin_dir: str, epics_dir: str, test: bool, version: bool
+    channels: int,
+    mark: int,
+    marker_channels: bool,
+    odin_dir: str,
+    epics_dir: str,
+    test: bool,
+    version: bool,
 ) -> None:
     if version:
         print(get_module_version_string())
@@ -119,6 +132,7 @@ def main(
         num_cards=math.ceil(int(channels) / 2),
         num_chans=channels,
         mark=mark,
+        marker_channels=marker_channels,
         odin_path=odin_path,
         epics_path=epics_path,
         test=test,

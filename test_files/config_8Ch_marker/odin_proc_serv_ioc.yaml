@@ -1,0 +1,8 @@
+ioc_name: XSPRESS-PROCSERV-IOC
+prefix: XSP-PROC-SERV
+process_prefix: XSP-ODN
+process_count: 12
+server_process_name: XSP-ODN-01
+server_delay: 2
+adodin_ioc_name: XSPRESS
+ioc_delay: 5
