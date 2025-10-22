@@ -8,6 +8,7 @@ File reader which can open HDF5 files produced in list mode by Odin.
 
 """
 
+import re
 from enum import Enum
 
 import h5py
@@ -99,8 +100,11 @@ class XspressListFileReader(FileReaderInterface):
         datasets = [key for key in file.keys() if self.dataset_key.value in key]
         self.file_datasets[file_index] = datasets
 
+        # Filter out marker channel data for now
+        ch_datasets = [ds for ds in datasets if re.match(r"^ch\d+_", ds)]
+
         channels = [
-            self.__get_channel_from_dataset_name(dataset) for dataset in datasets
+            self.__get_channel_from_dataset_name(dataset) for dataset in ch_datasets
         ]
         for channel in channels:
             self.channel_map_to_file_index[channel] = file_index

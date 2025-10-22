@@ -8,6 +8,16 @@ The format is based on `Keep a Changelog
 Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
 
+0.7.1
+-----
+
+Changed:
+
+- Added MC (marker channel) flag to config generation to make the configuration include the option for marker channels in list mode.
+  The data is added to the hdf5 data set with the suffix '_A'
+- `xspress-view` can open files with marker channel data although it doesn't do anything with it yet.
+
+
 0.7.0
 -----
 

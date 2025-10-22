@@ -7,7 +7,7 @@ from jinja2 import Environment, FileSystemLoader
 
 
 def create_fp_launch_script(
-    num_cards: int, template_dir: Path, target_dir: Path
+    num_cards: int, template_dir: Path, target_dir: Path,
 ) -> None:
     """Create the frame processor launch script
 
@@ -51,7 +51,10 @@ def _get_mca_datasets(
 
 
 def _get_list_mode_datasets(
-    first_channel: int, last_channel: int, num_events_per_chunk: int
+    first_channel: int,
+    last_channel: int,
+    num_events_per_chunk: int,
+    marker_channels: bool = False
 ) -> dict[str, dict[str, dict[str, dict]]]:
     datasets: dict[str, dict[str, dict[str, dict]]] = {"hdf": {"dataset": {}}}
     for channel in range(first_channel, last_channel + 1):
@@ -75,11 +78,47 @@ def _get_list_mode_datasets(
             "datatype": "uint8",
             "chunks": [num_events_per_chunk],
         }
-
+        print(f"Marker channels: {marker_channels}")
+        if marker_channels and channel == 1:
+            print("Adding marker datasets to FP configuration")
+            marker_datasets = _get_marker_datasets(num_events_per_chunk)
+            datasets["hdf"]["dataset"].update(marker_datasets["hdf"]["dataset"])
     return datasets
 
 
-def create_fp_config_file(num_cards: int, template_dir: Path, target_dir: Path) -> None:
+def _get_marker_datasets(
+        num_events_per_chunk: int) -> dict[str, dict[str, dict[str, dict]]]:
+    datasets: dict[str, dict[str, dict[str, dict]]] = {"hdf": {"dataset": {}}}
+    for marker_num in range(2):
+        # Time frame
+        datasets["hdf"]["dataset"][f"marker{marker_num}_time_frame"] = {
+            "datatype": "uint64",
+            "chunks": [num_events_per_chunk],
+        }
+        # Time stamp
+        datasets["hdf"]["dataset"][f"marker{marker_num}_time_stamp"] = {
+            "datatype": "uint64",
+            "chunks": [num_events_per_chunk],
+        }
+        # Event height
+        datasets["hdf"]["dataset"][f"marker{marker_num}_event_height"] = {
+            "datatype": "uint16",
+            "chunks": [num_events_per_chunk],
+        }
+        # Reset flag
+        datasets["hdf"]["dataset"][f"marker{marker_num}_reset_flag"] = {
+            "datatype": "uint8",
+            "chunks": [num_events_per_chunk],
+        }
+    return datasets
+
+
+def create_fp_config_file(
+        num_cards: int,
+        template_dir: Path,
+        target_dir: Path,
+        marker_channels: bool,
+) -> None:
     """Create the frame processor JSON configuration file
 
     Args:
@@ -109,6 +148,7 @@ def create_fp_config_file(num_cards: int, template_dir: Path, target_dir: Path) 
         filename_postfix = f"_{letter[card_num]}"
 
         channel_list: list[int] = list(range(start_chan, end_chan + 1))
+        marker_string = '"markers": true,' if marker_channels and card_num == 0 else ''
 
         mca_datasets = json.dumps(_get_mca_datasets(start_chan, end_chan))
         master_mca_dataset = f"mca_{card_num * 2 + 1}"
@@ -118,9 +158,19 @@ def create_fp_config_file(num_cards: int, template_dir: Path, target_dir: Path) 
         # we end up with missing data in the HDF file.
         num_events_per_frame = 524280
 
-        list_mode_datasets = json.dumps(
-            _get_list_mode_datasets(start_chan, end_chan, num_events_per_frame)
-        )
+        if marker_channels:
+            list_mode_datasets = json.dumps(
+                _get_list_mode_datasets(
+                    start_chan,
+                    end_chan,
+                    num_events_per_frame,
+                    marker_channels=True
+                )
+            )
+        else:
+            list_mode_datasets = json.dumps(
+                _get_list_mode_datasets(start_chan, end_chan, num_events_per_frame)
+            )
 
         fp_json_config = template.render(
             meta_port=meta_port,
@@ -131,10 +181,10 @@ def create_fp_config_file(num_cards: int, template_dir: Path, target_dir: Path) 
             mca_datasets=mca_datasets,
             master_mca_dataset=master_mca_dataset,
             channel_list=channel_list,
+            marker_string=marker_string,
             list_mode_datasets=list_mode_datasets,
             num_events_per_frame=num_events_per_frame,
         )
-
         # Parse as a JSON dict and format it nicely before saving
         formatted_config = json.dumps(json.loads(fp_json_config), indent=4)
 

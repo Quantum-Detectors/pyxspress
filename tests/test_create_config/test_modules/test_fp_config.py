@@ -34,9 +34,10 @@ def test_create_fp_launch_script(mock_chmod, tmp_path, template_dir) -> None:
 def test_create_fp_config_file(tmp_path, template_dir) -> None:
     # Setup
     num_cards = 4
+    marker_channels = False
     target_dir = tmp_path
 
-    create_fp_config_file(num_cards, template_dir, target_dir)
+    create_fp_config_file(num_cards, template_dir, target_dir, marker_channels)
 
     for card in range(num_cards):
         # Check that we generated 1 processor config per card

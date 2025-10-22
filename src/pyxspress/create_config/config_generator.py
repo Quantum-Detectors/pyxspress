@@ -50,6 +50,7 @@ class ConfigGenerator(Loggable):
         num_cards: int,
         num_chans: int,
         mark: int,
+        marker_channels: bool,
         odin_path: Path,
         epics_path: Path,
         test: bool,
@@ -75,6 +76,7 @@ class ConfigGenerator(Loggable):
         self.num_cards = num_cards
         self.num_chans = num_chans
         self.mark = mark
+        self.marker_channels = marker_channels
         self.odin_path = odin_path
         self.epics_path = epics_path
         self.test = test
@@ -95,7 +97,6 @@ class ConfigGenerator(Loggable):
             proc_serv_ioc,
             proc_serv_ioc_yaml,
             create_fp_launch_script,
-            create_fp_config_file,
             create_fr_launch_script,
             create_fr_config_file,
         ]
@@ -113,11 +114,17 @@ class ConfigGenerator(Loggable):
 
     def generate(self) -> None:
         """Generate the configuration for Odin and related software"""
+        if self.marker_channels:
+            marker_str = "  - Using marker channels\n"
+        else:
+            marker_str = ""
+
         self.logger.info(
             "Generating configuration files.\n\n"
             f"Configuration:\n"
             f"  - Cards: {self.num_cards}\n"
             f"  - Channels: {self.num_chans}\n"
+            f"{marker_str}"
             f"  - Generation: {self.mark}\n"
             f"  - Odin config path: {self.odin_path}\n"
             f"  - EPICS config path: {self.epics_path}\n"
@@ -137,6 +144,10 @@ class ConfigGenerator(Loggable):
 
         for func_with_cards_only in self.funcs_with_cards_only:
             func_with_cards_only(self.num_cards, self.template_dir, self.odin_path)
+
+        create_fp_config_file(
+            self.num_cards, self.template_dir, self.odin_path, self.marker_channels
+        )
 
         self.__create_adodin_ioc_files()
 
