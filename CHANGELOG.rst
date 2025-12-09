@@ -8,6 +8,19 @@ The format is based on `Keep a Changelog
 Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
 
+0.7.2
+-----
+
+Added:
+
+- Additional configuration option for using the TCP relay server has been added.
+  Odin will connect to the TCP relay server instead of directly to the Xspress
+  when enabled. This adds the relay server launch script which is called from
+  the main Odin launcher script using procServ.
+- Added an option to the List mode listener to listen to the TCP relay server
+  instead of the Xspress system directly
+
+
 0.7.1
 -----
 

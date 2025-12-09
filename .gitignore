@@ -20,4 +20,6 @@ __pycache__/
 # Virtual enviroments
 server/conf_venv
 
-
+# Testing data
+input_data/
+output_data/

@@ -37,6 +37,7 @@ class ConfigGenerator(Loggable):
 
     common_dir = config_dir / "common"
     module_dir = config_dir / "modules"
+    optional_script_dir = config_dir / "optional"
     template_dir = config_dir / "templates"
 
     # Installed ADOdin paths
@@ -53,6 +54,7 @@ class ConfigGenerator(Loggable):
         marker_channels: bool,
         odin_path: Path,
         epics_path: Path,
+        tcp_relay: bool,
         test: bool,
     ) -> None:
         """Create a config generator
@@ -68,6 +70,7 @@ class ConfigGenerator(Loggable):
             mark (int): X3X generation (Mk1 or 2)
             odin_path (Path): Odin config output directory
             epics_path (Path): EPICS config output directory
+            tcp_relay (bool): Add TCP relay server if true
             test (bool): Testing flag to build config in place.
         """
         super().__init__()
@@ -79,6 +82,7 @@ class ConfigGenerator(Loggable):
         self.marker_channels = marker_channels
         self.odin_path = odin_path
         self.epics_path = epics_path
+        self.tcp_relay = tcp_relay
         self.test = test
 
         # For Mk2 we have 1 processor per card
@@ -88,9 +92,7 @@ class ConfigGenerator(Loggable):
         self.funcs_with_cards_and_channels: list[
             Callable[[int, int, Path, Path], Any]
         ] = [
-            odin_server_config,
             create_meta_writer_launch_script,
-            launch_n_chan,
         ]
         self.funcs_with_cards_only: list[Callable[[int, Path, Path], Any]] = [
             create_live_view_launch_script,
@@ -99,6 +101,13 @@ class ConfigGenerator(Loggable):
             create_fp_launch_script,
             create_fr_launch_script,
             create_fr_config_file,
+        ]
+
+        self.funcs_with_cards_channels_and_tcp_relay_server: list[
+            Callable[[int, int, bool, Path, Path], Any]
+        ] = [
+            launch_n_chan,
+            odin_server_config,
         ]
 
         if self.test:
@@ -126,6 +135,7 @@ class ConfigGenerator(Loggable):
             f"  - Channels: {self.num_chans}\n"
             f"{marker_str}"
             f"  - Generation: {self.mark}\n"
+            f"  - TCP relay server: {self.tcp_relay}\n"
             f"  - Odin config path: {self.odin_path}\n"
             f"  - EPICS config path: {self.epics_path}\n"
         )
@@ -137,13 +147,24 @@ class ConfigGenerator(Loggable):
 
         self.__copy_common_files()
 
-        for func_cards_and_channels in self.funcs_with_cards_and_channels:
-            func_cards_and_channels(
+        self.__copy_optional_files()
+
+        for func_c_and_ch in self.funcs_with_cards_and_channels:
+            func_c_and_ch(
                 self.num_cards, self.num_chans, self.template_dir, self.odin_path
             )
 
-        for func_with_cards_only in self.funcs_with_cards_only:
-            func_with_cards_only(self.num_cards, self.template_dir, self.odin_path)
+        for func_c_only in self.funcs_with_cards_only:
+            func_c_only(self.num_cards, self.template_dir, self.odin_path)
+
+        for func_c_ch_and_tcp in self.funcs_with_cards_channels_and_tcp_relay_server:
+            func_c_ch_and_tcp(
+                self.num_cards,
+                self.num_chans,
+                self.tcp_relay,
+                self.template_dir,
+                self.odin_path,
+            )
 
         create_fp_config_file(
             self.num_cards, self.template_dir, self.odin_path, self.marker_channels
@@ -175,6 +196,7 @@ class ConfigGenerator(Loggable):
 
     def __copy_common_files(self) -> None:
         self.logger.info("Copying common shell scripts")
+
         for file in glob(f"{self.common_dir}/*.sh"):
             self.logger.debug(f"Copying {file} to {self.odin_path}")
             shutil.copy2(file, self.odin_path)
@@ -183,3 +205,12 @@ class ConfigGenerator(Loggable):
         for file in glob(f"{self.common_dir}/*.json"):
             self.logger.debug(f"Copying {file} to {self.odin_path}")
             shutil.copy2(file, self.odin_path)
+
+    def __copy_optional_files(self) -> None:
+        self.logger.info("Copying optional shell scripts")
+
+        if self.tcp_relay:
+            self.logger.info("Copying TCP relay script")
+            shutil.copy2(
+                f"{self.optional_script_dir / 'stTcpRelay.sh'}", self.odin_path
+            )

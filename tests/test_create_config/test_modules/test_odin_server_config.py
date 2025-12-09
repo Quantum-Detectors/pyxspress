@@ -35,7 +35,7 @@ def test_receiver_endpoints() -> None:
 @patch("pyxspress.create_config.modules.odin_server_config._processor_endpoints")
 @patch("pyxspress.create_config.modules.odin_server_config._receiver_endpoints")
 @patch("pyxspress.create_config.modules.odin_server_config._daq_endpoints")
-def test_odin_server_config(
+def test_odin_server_config_no_relay_server(
     mock_daq, mock_receiver, mock_processor, template_dir, tmp_path
 ) -> None:
     num_cards = 3
@@ -44,7 +44,29 @@ def test_odin_server_config(
     mock_receiver.return_value = "receiver_endpoints"
     mock_processor.return_value = "processor_endpoints"
 
-    odin_server_config(num_cards, num_chans, template_dir, tmp_path)
+    odin_server_config(num_cards, num_chans, False, template_dir, tmp_path)
+
+    assert (tmp_path / "odin_server.cfg").exists()
+    text = (tmp_path / "odin_server.cfg").read_text()
+    assert "daq_endpoints" in text
+    assert "receiver_endpoints" in text
+    assert "processor_endpoints" in text
+    assert "{}" not in text
+
+
+@patch("pyxspress.create_config.modules.odin_server_config._processor_endpoints")
+@patch("pyxspress.create_config.modules.odin_server_config._receiver_endpoints")
+@patch("pyxspress.create_config.modules.odin_server_config._daq_endpoints")
+def test_odin_server_config_with_relay_server(
+    mock_daq, mock_receiver, mock_processor, template_dir, tmp_path
+) -> None:
+    num_cards = 3
+    num_chans = 6
+    mock_daq.return_value = "daq_endpoints"
+    mock_receiver.return_value = "receiver_endpoints"
+    mock_processor.return_value = "processor_endpoints"
+
+    odin_server_config(num_cards, num_chans, True, template_dir, tmp_path)
 
     assert (tmp_path / "odin_server.cfg").exists()
     text = (tmp_path / "odin_server.cfg").read_text()

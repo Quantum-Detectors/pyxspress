@@ -7,7 +7,9 @@ from jinja2 import Environment, FileSystemLoader
 
 
 def create_fp_launch_script(
-    num_cards: int, template_dir: Path, target_dir: Path,
+    num_cards: int,
+    template_dir: Path,
+    target_dir: Path,
 ) -> None:
     """Create the frame processor launch script
 
@@ -54,7 +56,7 @@ def _get_list_mode_datasets(
     first_channel: int,
     last_channel: int,
     num_events_per_chunk: int,
-    marker_channels: bool = False
+    marker_channels: bool = False,
 ) -> dict[str, dict[str, dict[str, dict]]]:
     datasets: dict[str, dict[str, dict[str, dict]]] = {"hdf": {"dataset": {}}}
     for channel in range(first_channel, last_channel + 1):
@@ -78,16 +80,15 @@ def _get_list_mode_datasets(
             "datatype": "uint8",
             "chunks": [num_events_per_chunk],
         }
-        print(f"Marker channels: {marker_channels}")
         if marker_channels and channel == 1:
-            print("Adding marker datasets to FP configuration")
             marker_datasets = _get_marker_datasets(num_events_per_chunk)
             datasets["hdf"]["dataset"].update(marker_datasets["hdf"]["dataset"])
     return datasets
 
 
 def _get_marker_datasets(
-        num_events_per_chunk: int) -> dict[str, dict[str, dict[str, dict]]]:
+    num_events_per_chunk: int,
+) -> dict[str, dict[str, dict[str, dict]]]:
     datasets: dict[str, dict[str, dict[str, dict]]] = {"hdf": {"dataset": {}}}
     for marker_num in range(2):
         # Time frame
@@ -114,10 +115,10 @@ def _get_marker_datasets(
 
 
 def create_fp_config_file(
-        num_cards: int,
-        template_dir: Path,
-        target_dir: Path,
-        marker_channels: bool,
+    num_cards: int,
+    template_dir: Path,
+    target_dir: Path,
+    marker_channels: bool,
 ) -> None:
     """Create the frame processor JSON configuration file
 
@@ -148,7 +149,7 @@ def create_fp_config_file(
         filename_postfix = f"_{letter[card_num]}"
 
         channel_list: list[int] = list(range(start_chan, end_chan + 1))
-        marker_string = '"markers": true,' if marker_channels and card_num == 0 else ''
+        marker_string = '"markers": true,' if marker_channels and card_num == 0 else ""
 
         mca_datasets = json.dumps(_get_mca_datasets(start_chan, end_chan))
         master_mca_dataset = f"mca_{card_num * 2 + 1}"
@@ -161,10 +162,7 @@ def create_fp_config_file(
         if marker_channels:
             list_mode_datasets = json.dumps(
                 _get_list_mode_datasets(
-                    start_chan,
-                    end_chan,
-                    num_events_per_frame,
-                    marker_channels=True
+                    start_chan, end_chan, num_events_per_frame, marker_channels=True
                 )
             )
         else:

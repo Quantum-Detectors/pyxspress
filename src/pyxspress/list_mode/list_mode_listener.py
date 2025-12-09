@@ -20,9 +20,9 @@ class ListModeListener(Loggable):
     connection_timeout = 3
     packet_size_bytes = 8192
 
-    def __init__(self, ip_address: str, file_name: str | None):
+    def __init__(self, ip_address: str, file_name: str | None, port: int = 30125):
         """Create a new listener which listens to the TCP port of a single
-        X3X2 card for event data (port 30125).
+        X3X2 card or TCP relay server for event data.
 
         If given a file name then it will also save all of the data it
         receives.
@@ -30,11 +30,12 @@ class ListModeListener(Loggable):
         Args:
             ip_address (str): IP address of card
             file_name (Optional[str]): Filename to save binary stream to
+            port (int, optional): TCP port. Defaults to 30125 for real card.
         """
         super().__init__()
 
         self.ip_address = ipaddress.ip_address(ip_address)
-        self.port = 30125
+        self.port = port
         self.file_name = file_name
 
         self.connected = False
@@ -47,7 +48,8 @@ class ListModeListener(Loggable):
         self.data_thread.start()
 
         self.logger.info(
-            f"Listener started for {self.ip_address}:{self.port} (filename {file_name})"
+            f"Listener started for {self.ip_address}:{self.port} "
+            f"(filename: {file_name})"
         )
 
     def __connect(self):

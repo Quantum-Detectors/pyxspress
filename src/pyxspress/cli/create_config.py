@@ -45,7 +45,7 @@ from pyxspress.util import setup_basic_logging
     "--marker_channels",
     is_flag=True,
     default=False,
-    help="Flag to use configuration including or not including marker channels",
+    help="Add marker channels in event list mode",
 )
 @click.option(
     "-od",
@@ -60,6 +60,13 @@ from pyxspress.util import setup_basic_logging
     type=str,
     default="/odin/epics/config",
     help="Where to write generated EPICS configuration files",
+)
+@click.option(
+    "-tcp",
+    "--tcp_relay",
+    is_flag=True,
+    default=False,
+    help="Add TCP relay server in event list mode",
 )
 @click.option(
     "-t",
@@ -82,6 +89,7 @@ def main(
     odin_dir: str,
     epics_dir: str,
     test: bool,
+    tcp_relay: bool,
     version: bool,
 ) -> None:
     if version:
@@ -135,6 +143,7 @@ def main(
         marker_channels=marker_channels,
         odin_path=odin_path,
         epics_path=epics_path,
+        tcp_relay=tcp_relay,
         test=test,
     )
     generator.clean()
