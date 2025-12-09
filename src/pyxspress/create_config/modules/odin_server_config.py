@@ -23,13 +23,18 @@ def _receiver_endpoints(num_cards):
 
 
 def odin_server_config(
-    num_cards: int, num_chans: int, template_dir: Path, target_dir: Path
+    num_cards: int,
+    num_chans: int,
+    tcp_relay_server: bool,
+    template_dir: Path,
+    target_dir: Path,
 ) -> None:
     """Generate the Odin Python server configuration file
 
     Args:
         num_cards (int): Number of cards in Xspress system
         num_chans (int): Number of channels in Xspress system
+        tcp_relay_server (bool): Whether to use TCP relay server
         template_dir (Path): Template directory
         target_dir (Path): Output directory
     """
@@ -48,6 +53,7 @@ def odin_server_config(
     server_string = server_string.replace("{fr_endpoints}", fr_endpoints)
     server_string = server_string.replace("{adapter_endpoints}", adapter_endpoints)
     server_string = server_string.replace("{processes}", processes)
+    server_string = server_string.replace("{use_tcp_relay}", str(int(tcp_relay_server)))
 
     with open(target_dir / "odin_server.cfg", "w") as server_config_file:
         server_config_file.write(server_string)

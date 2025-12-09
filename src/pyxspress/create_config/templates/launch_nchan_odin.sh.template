@@ -8,7 +8,7 @@
 cd /odin/config
 
 # Odin processes
-{odin_processes}
+{odin_processes}{tcp_relay_servers}
 
 # ProcServControl IOCs
 procServ -P 9001 /odin/config/stProcServControl.sh

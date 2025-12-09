@@ -95,6 +95,7 @@ namespaces = false
 [tool.setuptools.package-data]
 pyxspress = [
     "create_config/common/*",
+    "create_config/optional/*",
     "create_config/templates/*",
     "create_config/files/*"
 ]

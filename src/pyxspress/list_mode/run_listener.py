@@ -13,7 +13,7 @@ from pyxspress.list_mode import ListModeListener
 from pyxspress.util import setup_basic_logging
 
 
-def run_single_listener(ip_address: str, file_path: str | None):
+def run_single_listener(ip_address: str, port: int, file_path: str | None):
     """Start a single event mode listener to listen to a single ADC card
 
     Args:
@@ -21,9 +21,11 @@ def run_single_listener(ip_address: str, file_path: str | None):
         file_path (Optional[str]): File path to write binary data to
     """
     logger = setup_basic_logging()
-    logger.info(f"Running listener for card {ip_address} to save to {file_path}")
+    logger.info(
+        f"Running listener for endpoint {ip_address}:{port} to save to {file_path}"
+    )
 
-    listener = ListModeListener(ip_address, file_name=file_path)
+    listener = ListModeListener(ip_address, file_name=file_path, port=port)
 
     # Wait for input to quit
     input()
@@ -35,10 +37,11 @@ def run_single_listener(ip_address: str, file_path: str | None):
 
 
 if __name__ == "__main__":
-    assert len(sys.argv) in [2, 3], (
-        "Expected 1 or 2 additional arguments as 'ip_address file_path'. "
+    assert len(sys.argv) in [3, 4], (
+        "Expected 2 or 3 additional arguments as 'ip_address port file_path'. "
         f"Got {len(sys.argv) - 1} ({sys.argv})"
     )
     ip_address = sys.argv[1]
-    file_path = sys.argv[2] if len(sys.argv) == 3 else None
-    run_single_listener(ip_address, file_path)
+    port = int(sys.argv[2])
+    file_path = sys.argv[3] if len(sys.argv) == 4 else None
+    run_single_listener(ip_address, port, file_path)
