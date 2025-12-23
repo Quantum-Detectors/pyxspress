@@ -7,6 +7,14 @@ The format is based on `Keep a Changelog
 <https://keepachangelog.com/en/1.0.0/>`_, and this project adheres to `Semantic
 Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
+0.7.3
+-----
+
+Changed:
+
+- Updated the default Odin data filepath to /tmp so that it is set to a valid
+  path when the IOC boots
+
 
 0.7.2
 -----

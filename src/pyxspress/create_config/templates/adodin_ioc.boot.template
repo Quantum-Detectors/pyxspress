@@ -44,7 +44,7 @@ dbpf "XSPRESS:CAM:LiveViewEndpoint", "tcp://127.0.0.1:15510"
 
 dbpf "XSPRESS:CAM:TriggerMode", "2"
 
-dbpf "XSPRESS:OD:FilePath", "/data/odin-testing"
+dbpf "XSPRESS:OD:FilePath", "/tmp"
 dbpf "XSPRESS:OD:FileName", "example"
 
 # -------------------------------------------
