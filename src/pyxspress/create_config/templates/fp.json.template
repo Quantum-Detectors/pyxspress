@@ -236,7 +236,12 @@
                         }
                     }
                 },
-                {{ mca_datasets }}
+                {{ mca_datasets }},
+                {
+                    "hdf": {
+                        "master": "{{ master_mca_dataset }}"
+                    }
+                }
             ]
         }
     },
@@ -285,7 +290,12 @@
                         "delete_datasets": true
                     }
                 },
-                {{ list_mode_datasets }}
+                {{ list_mode_datasets }},
+                {
+                    "hdf": {
+                        "master": "{{ master_list_mode_dataset }}"
+                    }
+                }
             ]
         }
     }

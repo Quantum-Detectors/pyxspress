@@ -114,6 +114,13 @@ def _get_marker_datasets(
     return datasets
 
 
+def get_master_list_mode_dataset(card_num: int, marker_channels: bool) -> str:
+    if card_num == 0 and marker_channels:
+        return "marker1_reset_flag"
+    else:
+        return f"ch{card_num * 2 + 1}_reset_flag"
+
+
 def create_fp_config_file(
     num_cards: int,
     template_dir: Path,
@@ -170,6 +177,12 @@ def create_fp_config_file(
                 _get_list_mode_datasets(start_chan, end_chan, num_events_per_frame)
             )
 
+        # Use the last list mode dataset written by the processor when adding
+        # events to track some form of progress
+        master_list_mode_dataset = get_master_list_mode_dataset(
+            card_num, marker_channels
+        )
+
         fp_json_config = template.render(
             meta_port=meta_port,
             ready_port=ready_port,
@@ -181,6 +194,7 @@ def create_fp_config_file(
             channel_list=channel_list,
             marker_string=marker_string,
             list_mode_datasets=list_mode_datasets,
+            master_list_mode_dataset=master_list_mode_dataset,
             num_events_per_frame=num_events_per_frame,
         )
         # Parse as a JSON dict and format it nicely before saving
