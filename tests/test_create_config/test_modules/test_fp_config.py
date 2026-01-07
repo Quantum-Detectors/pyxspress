@@ -54,38 +54,17 @@ def test_create_fp_config_file(tmp_path, template_dir) -> None:
         assert text == expected_contents
 
 
-def test_get_master_list_mode_dataset_first_card_no_markers() -> None:
+def test_get_master_list_mode_dataset_first_card() -> None:
     card_num = 0
-    marker_channels = False
 
     expected_dataset = "ch1_reset_flag"
 
-    assert get_master_list_mode_dataset(card_num, marker_channels) == expected_dataset
+    assert get_master_list_mode_dataset(card_num) == expected_dataset
 
 
-def test_get_master_list_mode_dataset_first_card_with_markers() -> None:
-    card_num = 0
-    marker_channels = True
-
-    expected_dataset = "marker1_reset_flag"
-
-    assert get_master_list_mode_dataset(card_num, marker_channels) == expected_dataset
-
-
-def test_get_master_list_mode_dataset_second_card_no_markers() -> None:
+def test_get_master_list_mode_dataset_second_card() -> None:
     card_num = 1
-    marker_channels = False
 
     expected_dataset = "ch3_reset_flag"
 
-    assert get_master_list_mode_dataset(card_num, marker_channels) == expected_dataset
-
-
-def test_get_master_list_mode_dataset_second_card_with_markers() -> None:
-    card_num = 1
-    marker_channels = True
-
-    # Marker channel option shouldn't have an effect here
-    expected_dataset = "ch3_reset_flag"
-
-    assert get_master_list_mode_dataset(card_num, marker_channels) == expected_dataset
+    assert get_master_list_mode_dataset(card_num) == expected_dataset

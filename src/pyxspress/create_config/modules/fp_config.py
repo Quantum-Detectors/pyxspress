@@ -114,11 +114,20 @@ def _get_marker_datasets(
     return datasets
 
 
-def get_master_list_mode_dataset(card_num: int, marker_channels: bool) -> str:
-    if card_num == 0 and marker_channels:
-        return "marker1_reset_flag"
-    else:
-        return f"ch{card_num * 2 + 1}_reset_flag"
+def get_master_list_mode_dataset(card_num: int) -> str:
+    """Get the name of the master list mode dataset to track frame processor frame
+    counting.
+
+    This gives some indication that frames are arriving but will only report
+    for a single channel.
+
+    Args:
+        card_num (int): ADC card number in system
+
+    Returns:
+        str: Master dataset name
+    """
+    return f"ch{card_num * 2 + 1}_reset_flag"
 
 
 def create_fp_config_file(
@@ -179,9 +188,7 @@ def create_fp_config_file(
 
         # Use the last list mode dataset written by the processor when adding
         # events to track some form of progress
-        master_list_mode_dataset = get_master_list_mode_dataset(
-            card_num, marker_channels
-        )
+        master_list_mode_dataset = get_master_list_mode_dataset(card_num)
 
         fp_json_config = template.render(
             meta_port=meta_port,
