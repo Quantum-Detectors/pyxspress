@@ -1,0 +1,25 @@
+
+{
+    "start_scripts": {
+        "autocalib": {
+            "directory":    "",
+            "command":      "xspress3-autocalib"
+        },
+        "epics": {
+            "directory":    "~/epics/",
+            "command":      "bin/run_xspress3.sh"
+        },
+        "odin": {
+            "directory":    "/odin/config/",
+            "command":      "./launch_8chan_odin.sh"
+        }
+    },
+    "stop_scripts": {
+        "odin":{
+            "directory":    "/odin/scripts/",
+            "command":      "kill_odin.sh"
+        }
+    }
+}
+
+
