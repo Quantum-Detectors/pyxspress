@@ -62,6 +62,8 @@ xspress-list-mode-decode = "pyxspress.cli.list_mode_decode:main"
 xspress-list-mode-listener = "pyxspress.cli.list_mode_listener:main"
 xspress-plot = "pyxspress.cli.plot_data:main"
 xspress-view = "pyxspress.cli.data_gui:main"
+xspress-switch-mode = "pyxspress.cli.switch_mode:main"
+xspress-config-read = "pyxspress.switch_mode.processes_stop:main"
 
 [build-system]
 requires = ["setuptools>=61.2"]
@@ -97,7 +99,8 @@ pyxspress = [
     "create_config/common/*",
     "create_config/optional/*",
     "create_config/templates/*",
-    "create_config/files/*"
+    "create_config/files/*",
+    "switch_mode/data/*"
 ]
 
 [tool.setuptools.dynamic]
