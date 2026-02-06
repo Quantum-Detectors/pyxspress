@@ -40,7 +40,7 @@ iocInit
 
 dbpf "XSPRESS:OD:ReadStatus.SCAN", "7"
 dbpf "XSPRESS:CAM:ReadStatus.SCAN", "7"
-dbpf "XSPRESS:CAM:LiveViewEndpoint", "tcp://127.0.0.1:15510"
+dbpf "XSPRESS:CAM:LiveViewEndpoint", "tcp://127.0.0.1:15550"
 
 dbpf "XSPRESS:CAM:TriggerMode", "2"
 
