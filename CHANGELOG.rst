@@ -7,6 +7,15 @@ The format is based on `Keep a Changelog
 <https://keepachangelog.com/en/1.0.0/>`_, and this project adheres to `Semantic
 Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
+0.7.7
+-----
+
+Changed:
+
+- Liveview endpoint was changed to allow for larger systems. 15510 -> 15550
+
+
+
 0.7.6
 -----
 
