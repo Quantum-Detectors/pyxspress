@@ -17,7 +17,7 @@ dependencies = [
     "jinja2",
     "importlib-metadata",
 ]
-license-files = ["LICENCE.rst"]
+license = "MIT"
 dynamic = ["version"]
 
 [project.optional-dependencies]
