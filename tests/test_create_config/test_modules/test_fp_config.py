@@ -6,7 +6,7 @@ from pyxspress.create_config.modules.fp_config import (
     get_master_list_mode_dataset,
 )
 
-from .util import get_8ch_file_string
+from .util import get_8ch_Mk2_file_string
 
 
 @patch("os.chmod")
@@ -50,7 +50,7 @@ def test_create_fp_config_file(tmp_path, template_dir) -> None:
         assert "}}" not in text
 
         # Compare to our example test files
-        expected_contents = get_8ch_file_string(f"fp{card + 1}.json")
+        expected_contents = get_8ch_Mk2_file_string(f"fp{card + 1}.json")
         assert text == expected_contents
 
 

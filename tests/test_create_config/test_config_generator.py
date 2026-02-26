@@ -27,7 +27,7 @@ def test_generate_in_test_mode_generates_expected_files(tmp_path) -> None:
     config_gen.clean()
     config_gen.generate()
 
-    expected_dir = Path("test_files/config_8Ch")
+    expected_dir = Path("test_files/config_8Ch_Mk2")
 
     expected_files = {f.name for f in expected_dir.iterdir() if f.is_file()}
     generated_files = {f.name for f in odin_path.iterdir() if f.is_file()}
@@ -83,7 +83,7 @@ def test_generate_in_test_mode_markers_generates_expected_files(tmp_path) -> Non
     config_gen.clean()
     config_gen.generate()
 
-    expected_dir = Path("test_files/config_8Ch_marker")
+    expected_dir = Path("test_files/config_8Ch_marker_Mk2")
 
     expected_files = {f.name for f in expected_dir.iterdir() if f.is_file()}
     generated_files = {f.name for f in odin_path.iterdir() if f.is_file()}
@@ -141,7 +141,7 @@ def test_generate_in_test_mode_with_tcp_relay_generates_expected_files(
     config_gen.clean()
     config_gen.generate()
 
-    expected_dir = Path("test_files/config_8Ch_tcp_relay")
+    expected_dir = Path("test_files/config_8Ch_tcp_relay_Mk2")
 
     expected_files = {f.name for f in expected_dir.iterdir() if f.is_file()}
     generated_files = {f.name for f in odin_path.iterdir() if f.is_file()}
@@ -204,7 +204,7 @@ def test_generate_rebuilds_adodin(mock_rebuild_adodin, tmp_path) -> None:
     config_gen.clean()
     config_gen.generate()
 
-    expected_dir = Path("test_files/config_8Ch")
+    expected_dir = Path("test_files/config_8Ch_Mk2")
 
     expected_files = {f.name for f in expected_dir.iterdir() if f.is_file()}
     generated_files = {f.name for f in odin_path.iterdir() if f.is_file()}

@@ -85,8 +85,12 @@ class ConfigGenerator(Loggable):
         self.tcp_relay = tcp_relay
         self.test = test
 
-        # For Mk2 we have 1 processor per card
-        self.num_processors = num_cards
+        # TODO change this based on generation of system
+        # Assuming Mk2 requires additional processor for optimisation
+        if mark == 2:
+            self.num_processors = num_cards
+        else:
+            self.num_processors = num_cards
 
         # Generated configuration functions with common arguments
         self.funcs_with_cards_and_channels: list[

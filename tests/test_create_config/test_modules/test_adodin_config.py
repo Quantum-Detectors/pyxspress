@@ -10,7 +10,7 @@ from pyxspress.create_config.modules.adodin_config import (
     rebuild_adodin,
 )
 
-from .util import get_8ch_file_string
+from .util import get_8ch_Mk2_file_string
 
 
 def test_odin_data_template() -> None:
@@ -67,7 +67,7 @@ def test_generate_ioc_db_substitutions_succeeds_and_does_not_copy_with_test_mode
     output_file = tmp_path / "xspress_expanded.substitutions"
     generated_contents = output_file.read_text()
 
-    expected_contents = get_8ch_file_string("xspress_expanded.substitutions")
+    expected_contents = get_8ch_Mk2_file_string("xspress_expanded.substitutions")
     assert generated_contents == expected_contents
 
     # Check the mocked shutil copy was never called
@@ -94,7 +94,7 @@ def test_generate_ioc_db_substitutions_succeeds_does_copy_with_normal_mode(
     output_file = tmp_path / "xspress_expanded.substitutions"
     generated_contents = output_file.read_text()
 
-    expected_contents = get_8ch_file_string("xspress_expanded.substitutions")
+    expected_contents = get_8ch_Mk2_file_string("xspress_expanded.substitutions")
     assert generated_contents == expected_contents
 
     # Check the mocked shutil copy was never called
