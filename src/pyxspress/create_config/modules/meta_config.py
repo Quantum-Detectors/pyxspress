@@ -34,7 +34,11 @@ def create_live_view_launch_script(
         live_view_string = live_view_temp.read()
 
     ports = _live_view(num_cards)
-    live_view_string = live_view_string.replace("{ports}", ports)
+    live_view_string = live_view_string.replace("{sub_ports}", ports)
+
+    # Default to 15550 to allow large systems
+    pub_port = "15550"
+    live_view_string = live_view_string.replace("{pub_port}", pub_port)
 
     target_filepath = target_dir / "stLiveViewMerge.sh"
     with open(target_filepath, "w") as live_view_file:
