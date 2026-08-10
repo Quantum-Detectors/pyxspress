@@ -4,4 +4,4 @@ SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
 
 export HDF5_PLUGIN_PATH=/odin/prefix/h5plugin
 
-/odin/prefix/bin/frameProcessor --ctrl=tcp://0.0.0.0:10{num} --config=$SCRIPT_DIR/fp{card}.json --log-config $SCRIPT_DIR/log4cxx.xml
+/opt/QD/bin/frameProcessor --ctrl=tcp://0.0.0.0:10{num} --config=$SCRIPT_DIR/fp{card}.json --log-config $SCRIPT_DIR/log4cxx.xml

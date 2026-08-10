@@ -2,4 +2,4 @@
 
 SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
 
-/odin/prefix/bin/frameReceiver --io-threads 1 --ctrl=tcp://0.0.0.0:10{num} --config=$SCRIPT_DIR/fr{card}.json --log-config $SCRIPT_DIR/log4cxx.xml
+/opt/QD/bin/frameReceiver --io-threads 1 --ctrl=tcp://0.0.0.0:10{num} --config=$SCRIPT_DIR/fr{card}.json --log-config $SCRIPT_DIR/log4cxx.xml

@@ -11,7 +11,7 @@
             "load": {
                 "index": "xspress",
                 "name": "XspressProcessPlugin",
-                "library": "/odin/prefix/lib/libXspressProcessPlugin.so"
+                "library": "/opt/QD/lib/libXspressProcessPlugin.so"
             }
         }
     },
@@ -20,7 +20,7 @@
             "load": {
                 "index": "xspress-list",
                 "name": "X3X2ListModeProcessPlugin",
-                "library": "/odin/prefix/lib/libX3X2ListModeProcessPlugin.so"
+                "library": "/opt/QD/lib/libX3X2ListModeProcessPlugin.so"
             }
         }
     },
@@ -29,7 +29,7 @@
             "load": {
                 "index": "view",
                 "name": "LiveViewPlugin",
-                "library": "/odin/prefix/lib/libLiveViewPlugin.so"
+                "library": "/opt/QD/lib/libLiveViewPlugin.so"
             }
         }
     },
@@ -38,7 +38,7 @@
             "load": {
                 "index": "offset",
                 "name": "OffsetAdjustmentPlugin",
-                "library":  "/odin/prefix/lib/libOffsetAdjustmentPlugin.so"
+                "library":  "/opt/QD/lib/libOffsetAdjustmentPlugin.so"
             }
         }
     },
@@ -47,7 +47,7 @@
             "load": {
                 "index": "param",
                 "name": "ParameterAdjustmentPlugin",
-                "library":  "/odin/prefix/lib/libParameterAdjustmentPlugin.so"
+                "library":  "/opt/QD/lib/libParameterAdjustmentPlugin.so"
             }
         }
     },
@@ -56,7 +56,7 @@
             "load": {
                 "index": "blosc",
                 "name": "BloscPlugin",
-                "library": "/odin/prefix/lib/libBloscPlugin.so"
+                "library": "/opt/QD/lib/libBloscPlugin.so"
             }
         }
     },
@@ -65,7 +65,7 @@
             "load": {
                 "index": "hdf",
                 "name": "FileWriterPlugin",
-                "library": "/odin/prefix/lib/libHdf5Plugin.so"
+                "library": "/opt/QD/lib/libHdf5Plugin.so"
             }
         }
     },
